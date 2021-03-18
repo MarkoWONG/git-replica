@@ -1,0 +1,4 @@
+
+Date	    Start	Stop	Activity	        Comments
+18/03/21	17:00	19:30	figuring our spec	testing with reference model and reading spec
+18/03/21	19:30	23:35	coding	            coded up init, add, commit

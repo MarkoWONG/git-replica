@@ -1,0 +1,13 @@
+#!/bin/dash
+
+for file in $@
+do
+    if [ -f "$file" ] &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
+    then 
+        cp "$file" ".girt/adds"
+    else
+        echo "girt-add: error: can not open '"$file"'"
+        exit 1
+    fi
+done
+exit 0;

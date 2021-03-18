@@ -1,0 +1,40 @@
+#!/bin/dash
+
+# error cases
+if [ $# != 2 ] && [ $# != 3 ]
+then 
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# = 2 ] && [ "$1" != "-m" ]
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# = 3 ] && [ "$1" != "-a" ] && [ "$2" != "-m" ]
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+fi
+
+#if all files in index is same as repo then print nothing to commit
+#echo "nothing to commit"
+
+#creating a commit sub directory
+commit_no=0;
+while [ -d "commit_"$commit_no"" ] 
+do
+    commit_no=$(( $commit_no + 1 ));
+done
+mkdir "commit_"$commit_no"";
+
+#copies files from adds into commmit sub directory
+for file in ".girt/adds"
+do
+    cp ".girt/adds "$file"" "commit_"$commit_no"";
+done
+
+#exit with message
+echo "Committed as commit "$commit_no"";
+exit 0;
+
