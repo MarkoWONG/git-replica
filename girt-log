@@ -1,0 +1,12 @@
+#!/bin/dash
+
+for directories in .girt/*
+do
+    if echo "$directories" | egrep -q '^.girt/commit_.$' && [ -d "$directories" ]
+    then
+        echo -n "$directories" | sed 's/.*commit_/''/g'
+        echo -n " "
+        cat "$directories/commit_message.txt"
+    fi
+done | sort -r;
+exit 0;

@@ -1,0 +1,47 @@
+#!/bin/dash
+
+if [ $# -ne 1 ]
+then
+    echo "usage: girt-show <commit>:<filename>"
+    exit 1;
+fi
+
+if echo $1 | egrep -q ':' #missing ':'
+then
+    :
+else
+    echo "girt-show: error: invalid object "$1"";
+    exit 1;
+fi
+
+commit_index=$(echo "$1" | sed 's/:.*$/''/g');
+filename=$(echo "$1" | sed 's/^.*:/''/g');
+
+if [ -z "$commit_index" ]
+then
+    if [ -f ".girt/adds/"$filename"" ]
+    then
+        cat ".girt/adds/"$filename"";
+        exit 0;
+    else 
+        echo "girt-show: error: '"$filename"' not found in index"
+        exit 1;
+    fi
+fi
+
+if [ -d ".girt/commit_"$commit_index"" ] 
+then
+    :   
+else
+    echo "girt-show: error: unknown commit '"$commit_index"'";
+    exit 1;
+fi
+
+if [ -f ".girt/commit_"$commit_index"/"$filename"" ]
+then
+    cat .girt/commit_"$commit_index"/"$filename";
+    exit 0;
+else
+    echo "girt-show: error: '"$filename"' not found in commit "$commit_index"";
+    exit 1;
+fi

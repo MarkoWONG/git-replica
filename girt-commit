@@ -1,38 +1,100 @@
 #!/bin/dash
 
 # error cases
-if [ $# != 2 ] && [ $# != 3 ]
+if [ $# -ne 2 ] && [ $# -ne 3 ]
 then 
     echo "usage: girt-commit [-a] -m commit-message";
     exit 1;
 
-elif [ $# = 2 ] && [ "$1" != "-m" ]
+elif [ $# -eq 2 ] && [ "$1" != "-m" ]
 then
     echo "usage: girt-commit [-a] -m commit-message";
     exit 1;
 
-elif [ $# = 3 ] && [ "$1" != "-a" ] && [ "$2" != "-m" ]
+elif [ $# -eq 2 ] && [ "$1" = "-m" ] && [ -z "$2" ]
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# -eq 2 ] && [ "$1" = "-m" ] && [ -z $(echo "$2" | sed 's/ /''/g') ]
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# -eq 3 ] && ([ "$1" != "-a" ] || [ "$2" != "-m" ])
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# -eq 3 ] && [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ -z "$3" ]
+then
+    echo "usage: girt-commit [-a] -m commit-message";
+    exit 1;
+
+elif [ $# -eq 3 ] && [ "$1" = "-a" ] && [ "$2" = "-m" ] && [ -z $(echo "$3" | sed 's/ /''/g') ]
 then
     echo "usage: girt-commit [-a] -m commit-message";
     exit 1;
 fi
 
-#if all files in index is same as repo then print nothing to commit
-#echo "nothing to commit"
-
-#creating a commit sub directory
+#calculate the commit number
 commit_no=0;
-while [ -d "commit_"$commit_no"" ] 
+while [ -d ".girt/commit_"$commit_no"" ] 
 do
     commit_no=$(( $commit_no + 1 ));
 done
-mkdir "commit_"$commit_no"";
+
+prev_commit_no=$(( $commit_no - 1 ));
+
+# if all files in adds is same as previous commmit then print nothing to commit
+if [ "$commit_no" != 0 ]
+then
+    difference_detected=1;
+
+    for file_check in .girt/adds/*
+    do
+        file_name=$(basename "$file_check");
+        #echo "file_name is "$file_name"";
+        #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
+        diff -s "$file_check" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
+        if [ $? -eq 0 ] #same file content
+        then 
+            :
+            #echo "nothing to commit"
+        else #1 or 2 so different file content or error like file not found
+            difference_detected=0;
+            #echo "Difference detected"
+        fi
+    done
+
+    if [ "$difference_detected" = 1 ]
+    then
+        echo "nothing to commit";
+        exit 1;
+    fi
+fi
+
+
+#creating a commit sub directory
+mkdir ".girt/commit_"$commit_no"";
 
 #copies files from adds into commmit sub directory
-for file in ".girt/adds"
+for file in .girt/adds/*
 do
-    cp ".girt/adds "$file"" "commit_"$commit_no"";
+    #echo "$file"
+    cp "$file" ".girt/commit_"$commit_no"";
 done
+
+#create a commit_message.txt for the commit
+if [ $# -eq 2 ]
+then
+    echo "$2" > .girt/commit_"$commit_no"/commit_message.txt;
+elif [ $# -eq 3 ]
+then
+    echo "$3" > .girt/commit_"$commit_no"/commit_message.txt;
+else
+    echo "error: $# -ne 2 or 3"
+fi
 
 #exit with message
 echo "Committed as commit "$commit_no"";
