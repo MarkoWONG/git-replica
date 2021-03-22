@@ -1,5 +1,10 @@
 #!/bin/dash
 
+if [ $# -le 1 ]
+then
+    echo "usage: girt-add <filenames>"
+    exit 1;
+fi
 if [ -d .girt ] || [ -d .girt/adds ]
 then 
     for file in $@

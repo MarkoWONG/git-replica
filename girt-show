@@ -1,5 +1,12 @@
 #!/bin/dash
 
+if [ -d .girt ]
+then :
+else 
+    echo "girt-show: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
 if [ $# -ne 1 ]
 then
     echo "usage: girt-show <commit>:<filename>"

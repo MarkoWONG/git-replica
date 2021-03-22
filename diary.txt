@@ -4,3 +4,4 @@ Date	    Start	Stop	Activity	        Comments
 18/03/21	19:30	23:35	coding	            coded up init, add, commit
 19/03/21    12:00   22:00   coding/testing      Finished subset 0
 19/03/21    22:00   22:32   Wrote tests         Started writing tests scripts for subset 0
+22/03/21    14:00   22:38   coding              figured out -a for commit and rm for subset 1

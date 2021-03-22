@@ -1,5 +1,12 @@
 #!/bin/dash
 
+if [ -d .girt ]
+then :
+else 
+    echo "girt-commit: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
 # error cases
 if [ $# -ne 2 ] && [ $# -ne 3 ]
 then 
@@ -77,6 +84,17 @@ fi
 
 #creating a commit sub directory
 mkdir ".girt/commit_"$commit_no"";
+
+# sync adds directory with cwd except files not added before
+if [ "$1" = "-a" ]
+then 
+    for add_files in .girt/adds/*
+    do
+        f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
+        #echo "$f_name syncing to adds";
+        cp "$f_name" ".girt/adds";
+    done
+fi
 
 #copies files from adds into commmit sub directory
 for file in .girt/adds/*

@@ -1,0 +1,82 @@
+#!/bin/dash
+
+if [ -d .girt ]
+then :
+else 
+    echo "girt-rm: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
+# usage check
+if [ $# -lt 1 ]
+then
+    echo "usage: girt-rm [--force] [--cached] <filenames>";
+    exit 1;
+elif [ $# -eq 1 ] && ([ $1 = "--force" ] || [ $1 = "--cached" ])
+then 
+    echo "usage: girt-rm [--force] [--cached] <filenames>";
+    exit 1;
+elif [ $# -eq 2 ] && [ $1 = "--force" ] && [ $2 = "--cached" ]
+then 
+    echo "usage: girt-rm [--force] [--cached] <filenames>";
+    exit 1;
+fi
+
+#calculate the commit number
+commit_no=0;
+while [ -d ".girt/commit_"$commit_no"" ] 
+do
+    commit_no=$(( $commit_no + 1 ));
+done
+
+prev_commit_no=$(( $commit_no - 1 ));
+
+# remove specified file from adds
+for file in $@
+do
+    
+    if [ -f .girt/adds/"$file" ]
+    then
+        # checking for unsaved changes in .girt/adds
+        diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
+        if [ $? -eq 0 ] #same file content
+        then 
+            :
+        else #1 or 2 so different file content or error like file not found
+            echo "girt-rm: error: '"$file"' has staged changes in the index"; #adds vs commit
+            exit 0;
+        fi
+
+        # checking for unsaved changes in cwd
+        diff -s "$file" ".girt/"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
+        if [ $? -eq 0 ] #same file content
+        then 
+            :
+        else #1 or 2 so different file content or error like file not found
+            echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository"; #cwd vs commit
+            exit 0;
+        fi
+
+        # remove file
+        echo "removing ./girt/adds/"$file"";
+        rm .girt/adds/"$file";
+    elif [ "$file" != '--force' ] || [ "$file" != '--cached' ] 
+    then
+        echo 'girt-rm: error: '"$file"' is not in the girt repository';    
+        exit 1;
+    fi
+    
+    # If the --cached option is specified, the file is removed only from the index, 
+    # and not from the current directory.
+    if [ "$1" = "--cached" ] || [ "$2" = "--cached" ]  
+    then
+        :
+    else
+        if [ -f ./"$file" ]
+        then
+            echo "removing ./"$file"";
+            rm ./"$file";
+        fi
+    fi
+
+done
