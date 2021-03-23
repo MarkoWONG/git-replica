@@ -34,33 +34,80 @@ prev_commit_no=$(( $commit_no - 1 ));
 # remove specified file from adds
 for file in $@
 do
-    
-    if [ -f .girt/adds/"$file" ]
-    then
-        if [ "$1" = "--cached" ] || [ "$2" = "--cached" ] ||  [ "$1" = "--force" ] || [ "$2" = "--force" ]  
+    if [ -f .girt/adds/"$file" ] || [ -f .girt/commit_"$prev_commit_no"/"$file" ] 
+    then 
+        adds_diff_repo=1;
+        cwd_diff_repo=1;
+        cwd_diff_adds=1;
+
+        # normal checking
+        if [ "$1" != "--force" ] && [ "$1" != "--cached" ] && [ "$2" != "--cached" ]
         then
-            :
-        else #girt-rm: error: 'a' in the repository is different to the working file
             # checking for unsaved changes in .girt/adds (#adds vs commit)
             diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -eq 0 ] #same file content
+            if [ $? -ne 0 ] # NOT same file content
             then 
-                :
-            else #1 or 2 so different file content or error like file not found
-                echo "girt-rm: error: '"$file"' has staged changes in the index";
-                exit 0;
+                adds_diff_repo=0;
             fi
 
             # checking for unsaved changes in cwd  (#cwd vs commit)
             diff -s "./"$file"" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -eq 0 ] #same file content
+            if [ $? -ne 0 ] # NOT same file content
             then 
-                :
-            else #1 or 2 so different file content or error like file not found
+                cwd_diff_repo=0; 
+            fi
+
+            # checking for unsaved changes in .girt/adds  (#cwd vs adds)
+            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            if [ $? -ne 0 ] # NOT same file content
+            then 
+                cwd_diff_adds=0; 
+            fi
+
+            if [ $adds_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            then 
                 echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
-                exit 0;
+                exit 1;
+
+            elif [ $adds_diff_repo = 0 ]
+            then
+                echo "girt-rm: error: '"$file"' has staged changes in the index";
+                exit 1;
+            elif [ $cwd_diff_repo = 0 ]
+            then 
+                echo "girt-rm: error: '"$file"' in the repository is different to the working file";
+                exit 1;
             fi
         fi
+
+        # checking for cached option
+        if [ "$1" != "--force" ]
+        then
+            # checking for unsaved changes in .girt/adds (#adds vs commit)
+            diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            if [ $? -ne 0 ] # NOT same file content
+            then 
+                adds_diff_repo=0;
+            fi
+
+            # checking for unsaved changes in .girt/adds  (#cwd vs adds)
+            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            if [ $? -ne 0 ] # NOT same file content
+            then 
+                cwd_diff_adds=0;
+            fi
+
+            if [ $adds_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            then 
+                echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
+                exit 1;
+            fi
+        fi
+    fi
+
+    if [ -f .girt/adds/"$file" ]
+    then
+    
         # remove file
         #echo "removing ./girt/adds/"$file"";
         rm .girt/adds/"$file";
