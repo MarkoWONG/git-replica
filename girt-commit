@@ -68,22 +68,26 @@ prev_commit_no=$(( $commit_no - 1 ));
 if [ "$commit_no" != 0 ]
 then
     difference_detected=1;
-     no_files_in_adds=0;
+    no_files_in_adds=0;
     for file_check in .girt/adds/*
     do
-        file_name=$(basename "$file_check");
-        #echo "file_name is "$file_name"";
-        #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
-        diff -s "$file_check" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
-        if [ $? -eq 0 ] #same file content
-        then 
-            :
-            #echo "nothing to commit"
-        else #1 or 2 so different file content or error like file not found
-            difference_detected=0;
-            #echo "Difference detected"
+        if [ -f "$file_check" ]
+        then
+            file_name=$(basename "$file_check");
+            #echo "file_name is "$file_name"";
+            #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
+            diff -s "$file_check" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
+            if [ $? -eq 0 ] #same file content
+            then 
+                :
+                #echo "nothing to commit"
+            else #1 or 2 so different file content or error like file not found
+                difference_detected=0;
+                #echo "Difference detected"
+            fi
+        
+            no_files_in_adds=$(( $no_files_in_adds + 1 ));
         fi
-        no_files_in_adds=$(( $no_files_in_adds + 1 ));
     done
 
     no_files_in_commit=0;
