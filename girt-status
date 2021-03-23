@@ -20,7 +20,7 @@ do
             cwd_diff_repo=1;
             cwd_diff_adds=1;
             # checking for unsaved changes in .girt/adds (#adds vs commit)
-            diff -s ".girt/adds/$file" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            diff -s ".girt/adds/"$file"" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
                 adds_diff_repo=0;
@@ -34,21 +34,21 @@ do
             fi
 
             # checking for unsaved changes in .girt/adds  (#cwd vs adds)
-            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            diff -s "./"$file"" ".girt/adds/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
                 cwd_diff_adds=0; 
             fi
 
-            if [ $adds_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            if [ "$adds_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_adds" -eq 0 ]
             then 
                 echo ""$file" - file changed, different changes staged for commit";
 
-            elif [ $adds_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ]
+            elif [ "$adds_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ]
             then
                 echo ""$file" - file changed, changes staged for commit";
                 
-            elif [ $cwd_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            elif [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_adds" -eq 0 ]
             then 
                 echo ""$file" - file changed, changes not staged for commit";
             else
@@ -57,7 +57,7 @@ do
 
         elif [ -f .girt/adds/"$file" ]
         then 
-            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            diff -s "./"$file"" ".girt/adds/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
                 echo ""$file" - added to index, file changed";
@@ -77,14 +77,14 @@ done
 for adds_file in .girt/adds/*
 do
     adds_file_name=$(basename "$adds_file");
-    if [ -f ./$adds_file_name ]
+    if [ -f ./"$adds_file_name" ]
     then
         :
     else
         #echo "checking "$adds_file_name"";
         if [ -f .girt/adds/"$adds_file_name" ] && [ -f .girt/commit_"$latest_commit_no"/"$adds_file_name" ]
         then
-            diff -s ".girt/adds/$adds_file_name" ".girt/commit_"$latest_commit_no"/"$adds_file_name"" >/dev/null 2>/dev/null;
+            diff -s ".girt/adds/"$adds_file_name"" ".girt/commit_"$latest_commit_no"/"$adds_file_name"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
                 echo ""$adds_file_name" - file deleted, different changes staged for commit";
@@ -102,7 +102,7 @@ done
 for commit_file in .girt/commit_"$latest_commit_no"/*
 do
     commit_file_name=$(basename "$commit_file");
-    if [ -f ./$commit_file_name ] || [ -f .girt/adds/"$commit_file_name" ] || [ "$commit_file_name" = commit_message.txt ]
+    if [ -f ./"$commit_file_name" ] || [ -f .girt/adds/"$commit_file_name" ] || [ "$commit_file_name" = "commit_message.txt" ]
     then
         :
     else
