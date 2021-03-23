@@ -44,6 +44,17 @@ then
     exit 1;
 fi
 
+# sync adds directory with cwd except files not added before
+if [ "$1" = "-a" ]
+then 
+    for add_files in .girt/adds/*
+    do
+        f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
+        #echo "$f_name syncing to adds";
+        cp "$f_name" ".girt/adds";
+    done
+fi
+
 #calculate the commit number
 commit_no=0;
 while [ -d ".girt/commit_"$commit_no"" ] 
@@ -57,7 +68,7 @@ prev_commit_no=$(( $commit_no - 1 ));
 if [ "$commit_no" != 0 ]
 then
     difference_detected=1;
-
+     no_files_in_adds=0;
     for file_check in .girt/adds/*
     do
         file_name=$(basename "$file_check");
@@ -72,7 +83,22 @@ then
             difference_detected=0;
             #echo "Difference detected"
         fi
+        no_files_in_adds=$(( $no_files_in_adds + 1 ));
     done
+
+    no_files_in_commit=0;
+    for file_check in .girt/commit_"$prev_commit_no"/*
+    do
+        no_files_in_commit=$(( $no_files_in_commit + 1 ));
+    done
+
+    if [ $(( $no_files_in_commit - $no_files_in_adds )) -ne 1 ]
+    then 
+        # echo "no_files in adds = $no_files_in_adds";
+        # echo "no_files in commit = $no_files_in_commit";
+        # echo "there are removed files in adds"
+        difference_detected=0;
+    fi
 
     if [ "$difference_detected" = 1 ]
     then
@@ -85,22 +111,15 @@ fi
 #creating a commit sub directory
 mkdir ".girt/commit_"$commit_no"";
 
-# sync adds directory with cwd except files not added before
-if [ "$1" = "-a" ]
-then 
-    for add_files in .girt/adds/*
-    do
-        f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
-        #echo "$f_name syncing to adds";
-        cp "$f_name" ".girt/adds";
-    done
-fi
 
 #copies files from adds into commmit sub directory
 for file in .girt/adds/*
 do
     #echo "$file"
-    cp "$file" ".girt/commit_"$commit_no"";
+    if [ -f "$file" ]
+    then
+        cp "$file" ".girt/commit_"$commit_no"";
+    fi
 done
 
 #create a commit_message.txt for the commit

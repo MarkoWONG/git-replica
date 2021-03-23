@@ -37,32 +37,36 @@ do
     
     if [ -f .girt/adds/"$file" ]
     then
-        # checking for unsaved changes in .girt/adds
-        diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
-        if [ $? -eq 0 ] #same file content
-        then 
+        if [ "$1" = "--cached" ] || [ "$2" = "--cached" ] ||  [ "$1" = "--force" ] || [ "$2" = "--force" ]  
+        then
             :
-        else #1 or 2 so different file content or error like file not found
-            echo "girt-rm: error: '"$file"' has staged changes in the index"; #adds vs commit
-            exit 0;
-        fi
+        else #girt-rm: error: 'a' in the repository is different to the working file
+            # checking for unsaved changes in .girt/adds (#adds vs commit)
+            diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            if [ $? -eq 0 ] #same file content
+            then 
+                :
+            else #1 or 2 so different file content or error like file not found
+                echo "girt-rm: error: '"$file"' has staged changes in the index";
+                exit 0;
+            fi
 
-        # checking for unsaved changes in cwd
-        diff -s "$file" ".girt/"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
-        if [ $? -eq 0 ] #same file content
-        then 
-            :
-        else #1 or 2 so different file content or error like file not found
-            echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository"; #cwd vs commit
-            exit 0;
+            # checking for unsaved changes in cwd  (#cwd vs commit)
+            diff -s "./"$file"" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            if [ $? -eq 0 ] #same file content
+            then 
+                :
+            else #1 or 2 so different file content or error like file not found
+                echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
+                exit 0;
+            fi
         fi
-
         # remove file
-        echo "removing ./girt/adds/"$file"";
+        #echo "removing ./girt/adds/"$file"";
         rm .girt/adds/"$file";
-    elif [ "$file" != '--force' ] || [ "$file" != '--cached' ] 
+    elif [ "$file" != '--force' ] && [ "$file" != '--cached' ] 
     then
-        echo 'girt-rm: error: '"$file"' is not in the girt repository';    
+        echo "girt-rm: error: '"$file"' is not in the girt repository";    
         exit 1;
     fi
     
@@ -74,7 +78,7 @@ do
     else
         if [ -f ./"$file" ]
         then
-            echo "removing ./"$file"";
+            #echo "removing ./"$file"";
             rm ./"$file";
         fi
     fi

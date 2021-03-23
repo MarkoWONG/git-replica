@@ -1,6 +1,6 @@
 #!/bin/dash
 
-if [ $# -le 1 ]
+if [ $# -lt 1 ]
 then
     echo "usage: girt-add <filenames>"
     exit 1;
@@ -9,9 +9,9 @@ if [ -d .girt ] || [ -d .girt/adds ]
 then 
     for file in $@
     do
-        if [ -f "$file" ] &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
+        if [ -f "$file" ] || [ -f .girt/adds/"$file" ] # &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
         then 
-            cp "$file" ".girt/adds";
+            :
         else
             echo "girt-add: error: can not open '"$file"'";
             exit 1;
@@ -21,4 +21,20 @@ else
     echo "girt-add: error: girt repository directory .girt not found"
     exit 1;
 fi
+
+for file in $@
+do
+    # adding the file if it exists in the cwd
+    if [ -f "$file" ] # &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
+    then 
+        cp "$file" ".girt/adds";
+    # removing a file if it is not in cwd but in .girt/adds
+    elif [ -f .girt/adds/"$file" ] 
+    then
+        rm .girt/adds/"$file";
+    else
+        echo "girt-add: error: can not open '"$file"'";
+        exit 1;
+    fi
+done
 exit 0;
