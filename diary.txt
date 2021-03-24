@@ -7,4 +7,5 @@ Date	    Start	Stop	Activity	        Comments
 22/03/21    14:00   22:38   coding              figured out -a for commit and rm for subset 1
 23/03/21    10:00   13:00   coding              finished off subset 1
 23/03/21    13:00   23:06   debugging           Debugged for subset 0 and 1 (finished subset 1 offically)
-24/03/21    10:00   11:30   coding/debugging    Started girt-branch and discovered bug in commit and fixed it
+24/03/21    10:00   12:30   coding/debugging    Started girt-branch and discovered bug in commit and fixed it
+24/03/21    18:00   22:00   coding              coded branch and checkout but stuck with changing directories in script

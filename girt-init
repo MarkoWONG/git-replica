@@ -7,6 +7,7 @@ then
 else
     mkdir ".girt"
     mkdir ".girt/adds"
+    mkdir ".girt/branches"
     echo "Initialized empty girt repository in .girt";
 fi
 

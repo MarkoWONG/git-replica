@@ -1,0 +1,42 @@
+#!/bin/dash
+
+change_dir() {
+    cd .girt/branches/b1
+}
+
+if [ -d .girt ]
+then :
+else 
+    echo "girt-commit: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
+if [ -d .girt/commit_0 ]
+then
+    :
+else
+    echo "girt-branch: error: this command can not be run until after the first commit"
+    exit 1;
+fi
+
+if [ $# -eq 1 ]
+then
+    if [ -d .girt/branches/"$1" ]
+    then 
+        echo "Switched to branch '"$1"'";
+        #alias branch_path="girt/branches/"$1"";
+        # ln -s -v .girt/branches/"$1" branch_path;
+        # cd branch_path;
+        change_dir
+        #cd .girt/branches/"$1"
+    elif [ "$1" = "master" ]
+    then
+        echo "Switched to branch '"$1"'";
+        # ln -s -v ../../.. hbranch;
+        # cd hbranch;
+    else
+        echo "girt-checkout: error: unknown branch '"$1"'";
+    fi
+else
+    echo "usage: girt-checkout <branch>"
+fi
