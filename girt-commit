@@ -49,9 +49,12 @@ if [ "$1" = "-a" ]
 then 
     for add_files in .girt/adds/*
     do
-        f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
-        #echo "$f_name syncing to adds";
-        cp "$f_name" ".girt/adds";
+        if [ -f "$add_files" ]
+        then
+            f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
+            #echo "$f_name syncing to adds";
+            cp "$f_name" ".girt/adds";
+        fi
     done
 fi
 
@@ -103,10 +106,24 @@ then
         # echo "there are removed files in adds"
         difference_detected=0;
     fi
-
     if [ "$difference_detected" = 1 ]
     then
         echo "nothing to commit";
+        exit 1;
+    fi
+else
+    no_files=0;
+    for files in .girt/adds/*
+    do
+        if [ -f "$files" ]
+        then
+            no_files=$(( $no_files + 1 ));
+        fi
+    done
+
+    if [ $no_files -eq 0 ]
+    then 
+        echo "nothing to commit"
         exit 1;
     fi
 fi

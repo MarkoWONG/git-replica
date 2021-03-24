@@ -1,0 +1,69 @@
+#!/bin/dash
+
+if [ -d .girt/commit_0 ]
+then
+    :
+else
+    echo "girt-branch: error: this command can not be run until after the first commit"
+    exit 1;
+fi
+
+if [ $# -eq 0 ]
+then 
+    #list branches
+    (for branches in .girt/branches/*
+    do
+        if [ -d "$branches" ]
+        then 
+            b_name=$(basename="$branches");
+            echo "$b_name";
+        fi
+    done
+    echo "master";)|sort;
+
+elif [ $# -eq 1 ] && [ "$1" = "-d" ]
+then 
+    echo "error girt-branch: error: branch name required";
+    exit 1;
+
+elif [ $# -eq 1 ] && $( echo "$1" | egrep '^-.*' )
+then 
+    echo "usage: girt-branch [-d] <branch>";
+    exit 1;
+
+elif [ $# -eq 1 ] && $( echo "$1" | egrep '^[^a-zA-Z].*' )
+then 
+    echo "girt-branch: error: invalid branch name '"$1"'";
+    exit 1;
+
+elif [ $# -eq 1 ]
+then 
+    #create that branch
+    if [ -d .girt/branches/"$1" ]
+    then 
+        echo "girt-branch: error: branch '"$1"' already exists";
+        exit 1;
+    else
+        #mkdir .girt/branches/"$1";
+        echo "making branch "$1"";
+        #copy of all files into branch?
+    fi
+elif [ $# -eq 2 ] && [ "$1" = "-d" ] && $( echo "$1" | egrep '^[a-zA-Z].*' )
+then
+    #delete that branch
+    if [ -d .girt/branches/"$1" ]
+    then 
+        rm -r .girt/branches/"$1";
+    else
+        echo "girt-branch: error: branch '"$1"' doesn't exist";
+        exit 1;
+    fi
+elif [ $# -eq 2 ] && [ "$1" = "-d" ] && $( echo "$1" | egrep '^[^a-zA-Z].*' )
+then 
+    echo "girt-branch: error: invalid branch name '"$1"'";
+    exit 1;
+
+else
+    echo "usage: girt-branch [-d] <branch>";
+    exit 1;
+fi
