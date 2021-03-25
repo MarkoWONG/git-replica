@@ -1,9 +1,5 @@
 #!/bin/dash
 
-change_dir() {
-    cd .girt/branches/b1
-}
-
 if [ -d .girt ]
 then :
 else 
@@ -21,19 +17,33 @@ fi
 
 if [ $# -eq 1 ]
 then
+    cwb=$(cat .girt/branches/current_working_branch.txt);
+    #echo "switch from "$cwb"";
     if [ -d .girt/branches/"$1" ]
     then 
+        # sync the branch you are swtiching from with cwd
+        for current_files in ./*
+        do
+            if [ -f "$current_files" ]
+            then
+                current_file_name=$(basename="$branch_files");
+                cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
+            fi
+        done
+
+        # sync cwd with the branch you are switching to
+        for branch_files in .girt/branches/"$1"/*
+        do
+            if [ -f "$branch_files" ]
+            then
+                branch_file_name=$(basename="$branch_files");
+                cp "$branch_files" ./"$branch_file_name" ;
+            fi
+        done
+
+        # update the current w orking branch
+        echo "$1" > .girt/branches/current_working_branch.txt;
         echo "Switched to branch '"$1"'";
-        #alias branch_path="girt/branches/"$1"";
-        # ln -s -v .girt/branches/"$1" branch_path;
-        # cd branch_path;
-        change_dir
-        #cd .girt/branches/"$1"
-    elif [ "$1" = "master" ]
-    then
-        echo "Switched to branch '"$1"'";
-        # ln -s -v ../../.. hbranch;
-        # cd hbranch;
     else
         echo "girt-checkout: error: unknown branch '"$1"'";
     fi

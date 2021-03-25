@@ -1,0 +1,46 @@
+#!/bin/dash
+
+if [ -d .girt ]
+then :
+else 
+    echo "girt-commit: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
+if [ -d .girt/commit_0 ]
+then
+    :
+else
+    echo "girt-branch: error: this command can not be run until after the first commit"
+    exit 1;
+fi
+
+if [ $# -eq 1 ]
+then
+    echo "girt-merge: error: empty commit message";
+    exit 1;
+fi
+
+if [ $# -ne 3 ]
+then 
+    echo "usage: girt-merge <branch|commit> -m message";
+    exit 1;
+elif [ "$2" != "-m" ]
+    echo "usage: girt-merge <branch|commit> -m message";
+    exit 1;
+fi
+
+# all commits can be accessed anywhere 
+# index is synced with branch along with cwd
+# no new commit is created
+if [ -d .girt/"$1" ] || [ -d .girt/branches/"$1" ]
+then
+    if [ -d .girt/"$1" ] && [ "$1" != "adds" ]
+    then
+
+else 
+    echo "girt-merge: error: unknown branch '"$1"'"
+fi
+
+
+

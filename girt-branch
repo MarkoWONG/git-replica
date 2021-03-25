@@ -46,7 +46,7 @@ then
 elif [ $# -eq 1 ]
 then 
     #create that branch
-    if [ -d .girt/branches/"$1" ] || [ "$1" = "master" ]
+    if [ -d .girt/branches/"$1" ]
     then 
         echo "girt-branch: error: branch '"$1"' already exists";
         exit 1;
@@ -60,7 +60,6 @@ then
                 cp "$file" .girt/branches/"$1"/"$file";
             fi
         done
-        #copy of all files into branch?
     fi
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] &&  echo "$2" | egrep -q '^[a-zA-Z].*'
 then

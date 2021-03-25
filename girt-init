@@ -5,9 +5,11 @@ then
     echo "girt-init: error: .girt already exists"
     exit 1;
 else
-    mkdir ".girt"
-    mkdir ".girt/adds"
-    mkdir ".girt/branches"
+    mkdir ".girt";
+    mkdir ".girt/adds";
+    mkdir ".girt/branches";
+    mkdir ".girt/branches/master";
+    echo "master" > ".girt/branches/current_working_branch.txt";
     echo "Initialized empty girt repository in .girt";
 fi
 
