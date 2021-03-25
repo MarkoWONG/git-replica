@@ -10,4 +10,4 @@ Date	    Start	Stop	Activity	        Comments
 24/03/21    10:00   12:30   coding/debugging    Started girt-branch and discovered bug in commit and fixed it
 24/03/21    18:00   22:00   coding              coded branch and checkout but stuck with changing directories in script
 25/03/21    10:30   12:00   debugging           Realised my method for girt-checkout was wrong and redid it
-26/03/21    14:00           coding              finsihed branch and checkout and most of merge.
+26/03/21    14:00   22:17   coding              coded branch and checkout and some of merge.

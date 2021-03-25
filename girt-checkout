@@ -21,6 +21,16 @@ then
     #echo "switch from "$cwb"";
     if [ -d .girt/branches/"$1" ]
     then 
+
+        # for b_files in .girt/branches/"$1"/*
+        # do
+        #     if [ -f "$b_files" ]
+        #     then
+        #         file_name=$(basename "$b_files");
+        #         rm "$b_files";
+        #     fi
+        # done
+
         # sync the branch you are swtiching from with cwd
         for current_files in ./*
         do
@@ -28,6 +38,17 @@ then
             then
                 current_file_name=$(basename "$branch_files");
                 cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
+                cp "$current_files" .girt/branches/"$1"/"$current_file_name";
+            fi
+        done
+
+        #remove all files in cwd to be updated with new branch
+        for files in ./*
+        do
+            if [ -f "$files" ]
+            then
+                file_name=$(basename "$files");
+                rm "$files";
             fi
         done
 
@@ -41,7 +62,7 @@ then
             fi
         done
 
-        # update the current w orking branch
+        # update the current working branch
         echo "$1" > .girt/branches/current_working_branch.txt;
         echo "Switched to branch '"$1"'";
     else
