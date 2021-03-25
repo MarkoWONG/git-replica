@@ -26,7 +26,7 @@ then
         do
             if [ -f "$current_files" ]
             then
-                current_file_name=$(basename="$branch_files");
+                current_file_name=$(basename "$branch_files");
                 cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
             fi
         done

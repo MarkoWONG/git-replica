@@ -22,11 +22,10 @@ then
     do
         if [ -d "$branches" ]
         then 
-            b_name=$(basename="$branches");
+            b_name=$(basename "$branches");
             echo "$b_name";
         fi
-    done
-    echo "master";)|sort;
+    done )|sort;
 
 elif [ $# -eq 1 ] && [ "$1" = "-d" ]
 then 
@@ -64,8 +63,9 @@ then
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] &&  echo "$2" | egrep -q '^[a-zA-Z].*'
 then
     #delete that branch
-    if [ -d .girt/branches/"$2" ]
+    if [ -d .girt/branches/"$2" ] && [ "$2" != "master" ]
     then 
+        echo "Deleted branch '"$2"'";
         rm -r .girt/branches/"$2";
     elif [ "$2" = "master" ]
     then
