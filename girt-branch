@@ -51,6 +51,7 @@ then
         exit 1;
     else
         mkdir .girt/branches/"$1";
+        #mkdir .girt/branches/"$1"/commits
         #echo "making branch "$1"";
         for file in *
         do

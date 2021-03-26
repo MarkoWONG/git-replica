@@ -21,7 +21,11 @@ then
     #echo "switch from "$cwb"";
     if [ -d .girt/branches/"$1" ]
     then 
-
+        if [ "$1" = "$cwb" ]
+        then
+            echo "Already on '"$1"'";
+            exit 1;
+        fi
         # for b_files in .girt/branches/"$1"/*
         # do
         #     if [ -f "$b_files" ]
