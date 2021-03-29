@@ -34,10 +34,10 @@ then
             if [ -f "$current_files" ]
             then
                 current_file_name=$(basename "$branch_files");
-                #echo "copying "$current_files" to .girt/branches/"$cwb"/"$current_file_name"";
+                echo ""$current_files" --> .girt/branches/"$cwb"/"$current_file_name"";
                 cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
-
-                cp "$current_files" .girt/branches/"$1"/"$current_file_name";
+                #echo "copying "$current_files" to .girt/branches/"$1"/"$current_file_name"";
+                #cp "$current_files" .girt/branches/"$1"/"$current_file_name";
             fi
         done
 
@@ -51,6 +51,7 @@ then
         cwb_latest_commit_no=$(( $commit_no - 1 ));
 
         #track the lastest commit within a branch
+        echo "updating "$cwb" commit no to "$cwb_latest_commit_no"";
         echo "$cwb_latest_commit_no" > .girt/branches/"$cwb"/latest_commit_no.txt;
 
         #remove all files in cwd to be updated with new branch
@@ -69,7 +70,7 @@ then
             branch_file_name=$(basename "$branch_files");
             if [ -f "$branch_files" ] && [ "$branch_file_name" != "latest_commit_no.txt" ]
             then
-                #echo "copying "$branch_files" to ./"$branch_file_name""; 
+                echo ""$branch_files" --> ./"$branch_file_name""; 
                 cp "$branch_files" ./"$branch_file_name" ;
             fi
         done
@@ -88,6 +89,7 @@ then
                 branch_file_name=$(basename "$branch_files");
                 if [ -f "$branch_files" ] && [ "$branch_file_name" != "commit_message.txt" ]
                 then
+                    echo ""$branch_files" --> ./"$branch_file_name"";  
                     cp "$branch_files" ./"$branch_file_name" ;
                 fi
             done
