@@ -1,16 +1,29 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-init setups an empty repository
 
+# There can only be one .girt repository per directory
 if [ -d ".girt" ] 
 then 
     echo "girt-init: error: .girt already exists"
     exit 1;
 else
+    #create a empty repository called .girt
     mkdir ".girt";
-    mkdir ".girt/adds";
+
+    #create a index sub directory to contain 'snapshots' of tracked files
+    mkdir ".girt/index";
+
+    #create a branches sub directory for potiential new branches
     mkdir ".girt/branches";
+
+    #create a master branch for default branch
     mkdir ".girt/branches/master";
+
+    #create a file to track the current working branch
     echo "master" > ".girt/branches/current_working_branch.txt";
+
     echo "Initialized empty girt repository in .girt";
+    exit 0;
 fi
 
-exit 0;

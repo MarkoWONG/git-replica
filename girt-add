@@ -1,15 +1,21 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-add will add files to be tracked by the repository
 
+# Error check: There must be at least one argument called with the script 
 if [ $# -lt 1 ]
 then
     echo "usage: girt-add <filenames>"
     exit 1;
 fi
-if [ -d .girt ] || [ -d .girt/adds ]
+# Error check: There must be an existing .girt repository and a sub directory called index
+if [ -d .girt ] || [ -d .girt/index ]
 then 
     for file in $@
     do
-        if [ -f "$file" ] || [ -f .girt/adds/"$file" ] # &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
+        # Every argument called with the script must be a readable file in the
+        # current working directory(cwd) or in the index sub directory
+        if [ -f "$file" ] || [ -f .girt/index/"$file" ] 
         then 
             :
         else
@@ -24,14 +30,16 @@ fi
 
 for file in $@
 do
-    # adding the file if it exists in the cwd
-    if [ -f "$file" ] # &&  echo "$file" | egrep -q ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$
+    # Add the file if it exists in the cwd
+    if [ -f "$file" ] 
     then 
-        cp "$file" ".girt/adds";
-    # removing a file if it is not in cwd but in .girt/adds
-    elif [ -f .girt/adds/"$file" ] 
+        cp "$file" ".girt/index";
+
+    # Remove the file if it is not in cwd but in .girt/index as it means the 
+    # file has been deleted
+    elif [ -f .girt/index/"$file" ] 
     then
-        rm .girt/adds/"$file";
+        rm .girt/index/"$file";
     else
         echo "girt-add: error: can not open '"$file"'";
         exit 1;

@@ -14,16 +14,16 @@ for file in *
 do
     if [ -f "$file" ]
     then
-        if [ -f .girt/adds/"$file" ] && [ -f .girt/commit_"$latest_commit_no"/"$file" ]
+        if [ -f .girt/index/"$file" ] && [ -f .girt/commit_"$latest_commit_no"/"$file" ]
         then
-            adds_diff_repo=1;
+            index_diff_repo=1;
             cwd_diff_repo=1;
-            cwd_diff_adds=1;
-            # checking for unsaved changes in .girt/adds (#adds vs commit)
-            diff -s ".girt/adds/"$file"" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            cwd_diff_index=1;
+            # checking for unsaved changes in .girt/index (#index vs commit)
+            diff -s ".girt/index/"$file"" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                adds_diff_repo=0;
+                index_diff_repo=0;
             fi
 
             # checking for unsaved changes in cwd  (#cwd vs commit)
@@ -33,31 +33,31 @@ do
                 cwd_diff_repo=0; 
             fi
 
-            # checking for unsaved changes in .girt/adds  (#cwd vs adds)
-            diff -s "./"$file"" ".girt/adds/"$file"" >/dev/null 2>/dev/null;
+            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            diff -s "./"$file"" ".girt/index/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                cwd_diff_adds=0; 
+                cwd_diff_index=0; 
             fi
 
-            if [ "$adds_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_adds" -eq 0 ]
+            if [ "$index_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_index" -eq 0 ]
             then 
                 echo ""$file" - file changed, different changes staged for commit";
 
-            elif [ "$adds_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ]
+            elif [ "$index_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ]
             then
                 echo ""$file" - file changed, changes staged for commit";
                 
-            elif [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_adds" -eq 0 ]
+            elif [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_index" -eq 0 ]
             then 
                 echo ""$file" - file changed, changes not staged for commit";
             else
                 echo ""$file" - same as repo";
             fi
 
-        elif [ -f .girt/adds/"$file" ]
+        elif [ -f .girt/index/"$file" ]
         then 
-            diff -s "./"$file"" ".girt/adds/"$file"" >/dev/null 2>/dev/null;
+            diff -s "./"$file"" ".girt/index/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
                 echo ""$file" - added to index, file changed";
@@ -73,27 +73,27 @@ do
     fi
 done 
 
-#check files that are not in cwd but in adds
-for adds_file in .girt/adds/*
+#check files that are not in cwd but in index
+for index_file in .girt/index/*
 do
-    adds_file_name=$(basename "$adds_file");
-    if [ -f ./"$adds_file_name" ]
+    index_file_name=$(basename "$index_file");
+    if [ -f ./"$index_file_name" ]
     then
         :
     else
-        #echo "checking "$adds_file_name"";
-        if [ -f .girt/adds/"$adds_file_name" ] && [ -f .girt/commit_"$latest_commit_no"/"$adds_file_name" ]
+        #echo "checking "$index_file_name"";
+        if [ -f .girt/index/"$index_file_name" ] && [ -f .girt/commit_"$latest_commit_no"/"$index_file_name" ]
         then
-            diff -s ".girt/adds/"$adds_file_name"" ".girt/commit_"$latest_commit_no"/"$adds_file_name"" >/dev/null 2>/dev/null;
+            diff -s ".girt/index/"$index_file_name"" ".girt/commit_"$latest_commit_no"/"$index_file_name"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                echo ""$adds_file_name" - file deleted, different changes staged for commit";
+                echo ""$index_file_name" - file deleted, different changes staged for commit";
             else
-                echo ""$adds_file_name" - file deleted";
+                echo ""$index_file_name" - file deleted";
             fi
-        elif [ -f .girt/adds/"$adds_file_name" ]
+        elif [ -f .girt/index/"$index_file_name" ]
         then
-            echo ""$adds_file_name" - added to index, file deleted";
+            echo ""$index_file_name" - added to index, file deleted";
         fi
     fi
 done 
@@ -102,7 +102,7 @@ done
 for commit_file in .girt/commit_"$latest_commit_no"/*
 do
     commit_file_name=$(basename "$commit_file");
-    if [ -f ./"$commit_file_name" ] || [ -f .girt/adds/"$commit_file_name" ] || [ "$commit_file_name" = "commit_message.txt" ]
+    if [ -f ./"$commit_file_name" ] || [ -f .girt/index/"$commit_file_name" ] || [ "$commit_file_name" = "commit_message.txt" ]
     then
         :
     else

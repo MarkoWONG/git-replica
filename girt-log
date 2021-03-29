@@ -1,5 +1,9 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-log prints a line for every commit made to the repository: each line 
+# should contain the commit number, and the commit message.
 
+# There have to be a existing .girt repository
 if [ -d .girt ]
 then :
 else 

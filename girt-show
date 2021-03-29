@@ -1,5 +1,9 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-show prints the contents of the specified filename as of the specified commit. 
+# If commit is omitted, the contents of the file in the index should be printed.
 
+# There have to be a existing .girt repository
 if [ -d .girt ]
 then :
 else 
@@ -7,13 +11,15 @@ else
     exit 1;
 fi
 
+# There can be only one argument
 if [ $# -ne 1 ]
 then
     echo "usage: girt-show <commit>:<filename>"
     exit 1;
 fi
 
-if echo $1 | egrep -q ':' #missing ':'
+# There is a missing ':'
+if echo "$1" | egrep -q ':'
 then
     :
 else
@@ -21,14 +27,16 @@ else
     exit 1;
 fi
 
+# Extract the info from argument and assign it to a variable
 commit_index=$(echo "$1" | sed 's/:.*$/''/g');
 filename=$(echo "$1" | sed 's/^.*:/''/g');
 
+# if there is no commit number then print out contents from index
 if [ -z "$commit_index" ]
 then
-    if [ -f ".girt/adds/"$filename"" ]
+    if [ -f ".girt/index/"$filename"" ]
     then
-        cat ".girt/adds/"$filename"";
+        cat ".girt/index/"$filename"";
         exit 0;
     else 
         echo "girt-show: error: '"$filename"' not found in index"
@@ -36,6 +44,7 @@ then
     fi
 fi
 
+# Check if the commit number is valid
 if [ -d ".girt/commit_"$commit_index"" ] 
 then
     :   
@@ -44,6 +53,7 @@ else
     exit 1;
 fi
 
+# if there is a commit number then print out contents from that commit number
 if [ -f ".girt/commit_"$commit_index"/"$filename"" ]
 then
     cat .girt/commit_"$commit_index"/"$filename";

@@ -31,23 +31,23 @@ done
 
 prev_commit_no=$(( $commit_no - 1 ));
 
-# remove specified file from adds
+# remove specified file from index
 for file in $@
 do
-    if [ -f .girt/adds/"$file" ] || [ -f .girt/commit_"$prev_commit_no"/"$file" ] 
+    if [ -f .girt/index/"$file" ] || [ -f .girt/commit_"$prev_commit_no"/"$file" ] 
     then 
-        adds_diff_repo=1;
+        index_diff_repo=1;
         cwd_diff_repo=1;
-        cwd_diff_adds=1;
+        cwd_diff_index=1;
 
         # normal checking
         if [ "$1" != "--force" ] && [ "$1" != "--cached" ] && [ "$2" != "--cached" ]
         then
-            # checking for unsaved changes in .girt/adds (#adds vs commit)
-            diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            # checking for unsaved changes in .girt/index (#index vs commit)
+            diff -s ".girt/index/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                adds_diff_repo=0;
+                index_diff_repo=0;
             fi
 
             # checking for unsaved changes in cwd  (#cwd vs commit)
@@ -57,19 +57,19 @@ do
                 cwd_diff_repo=0; 
             fi
 
-            # checking for unsaved changes in .girt/adds  (#cwd vs adds)
-            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            diff -s "./"$file"" ".girt/index/$file" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                cwd_diff_adds=0; 
+                cwd_diff_index=0; 
             fi
 
-            if [ $adds_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            if [ $index_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ] && [ $cwd_diff_index = 0 ]
             then 
                 echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
                 exit 1;
 
-            elif [ $adds_diff_repo = 0 ]
+            elif [ $index_diff_repo = 0 ]
             then
                 echo "girt-rm: error: '"$file"' has staged changes in the index";
                 exit 1;
@@ -83,21 +83,21 @@ do
         # checking for cached option
         if [ "$1" != "--force" ]
         then
-            # checking for unsaved changes in .girt/adds (#adds vs commit)
-            diff -s ".girt/adds/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
+            # checking for unsaved changes in .girt/index (#index vs commit)
+            diff -s ".girt/index/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                adds_diff_repo=0;
+                index_diff_repo=0;
             fi
 
-            # checking for unsaved changes in .girt/adds  (#cwd vs adds)
-            diff -s "./"$file"" ".girt/adds/$file" >/dev/null 2>/dev/null;
+            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            diff -s "./"$file"" ".girt/index/$file" >/dev/null 2>/dev/null;
             if [ $? -ne 0 ] # NOT same file content
             then 
-                cwd_diff_adds=0;
+                cwd_diff_index=0;
             fi
 
-            if [ $adds_diff_repo = 0 ] && [ $cwd_diff_adds = 0 ]
+            if [ $index_diff_repo = 0 ] && [ $cwd_diff_index = 0 ]
             then 
                 echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
                 exit 1;
@@ -105,12 +105,12 @@ do
         fi
     fi
 
-    if [ -f .girt/adds/"$file" ]
+    if [ -f .girt/index/"$file" ]
     then
     
         # remove file
-        #echo "removing ./girt/adds/"$file"";
-        rm .girt/adds/"$file";
+        #echo "removing ./girt/index/"$file"";
+        rm .girt/index/"$file";
     elif [ "$file" != '--force' ] && [ "$file" != '--cached' ] 
     then
         echo "girt-rm: error: '"$file"' is not in the girt repository";    

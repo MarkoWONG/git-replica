@@ -1,5 +1,8 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-Commit saves a copy of all files in the index sub directory to the repository
 
+# Error cases
 if [ -d .girt ]
 then :
 else 
@@ -7,7 +10,6 @@ else
     exit 1;
 fi
 
-# error cases
 if [ $# -ne 2 ] && [ $# -ne 3 ]
 then 
     echo "usage: girt-commit [-a] -m commit-message";
@@ -44,21 +46,20 @@ then
     exit 1;
 fi
 
-# sync adds directory with cwd except files not added before
+# Copy all files in the current working directory (cwd) to index sub directory
 if [ "$1" = "-a" ]
 then 
-    for add_files in .girt/adds/*
+    for index_files in .girt/index/*
     do
-        if [ -f "$add_files" ]
+        if [ -f "$index_files" ]
         then
-            f_name=$(echo "$add_files" | sed 's/.girt\/adds\//''/g');
-            #echo "$f_name syncing to adds";
-            cp "$f_name" ".girt/adds";
+            f_name=$(basename "$index_files");
+            cp "$f_name" ".girt/index";
         fi
     done
 fi
 
-#calculate the commit number
+# Calculate the prev commit number and next commit number
 commit_no=0;
 while [ -d ".girt/commit_"$commit_no"" ] 
 do
@@ -67,43 +68,47 @@ done
 
 prev_commit_no=$(( $commit_no - 1 ));
 
-# if all files in adds is same as previous commmit then print nothing to commit
+# commit_no = 0 means there is no existing commits
 if [ "$commit_no" != 0 ]
 then
+    # keeps track of if there is a difference between index and latest commit
     difference_detected=1;
-    no_files_in_adds=0;
-    for file_check in .girt/adds/*
+
+    # Keeps track of the number of files in the sub directory, index
+    no_files_in_index=0;
+    for file_check in .girt/index/*
     do
+        #check if there is a difference between index and latest commit
         if [ -f "$file_check" ]
         then
             file_name=$(basename "$file_check");
-            #echo "file_name is "$file_name"";
-            #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
+
+            # if there is no difference between the index sub directory and the 
+            # latest commit then there is nothing to commit
             diff -s "$file_check" ".girt/commit_"$prev_commit_no"/"$file_name"" >/dev/null 2>/dev/null;
-            if [ $? -eq 0 ] #same file content
-            then 
-                :
-                #echo "nothing to commit"
-            else #1 or 2 so different file content or error like file not found
-                difference_detected=0;
-                #echo "Difference detected"
+            if [ $? -ne 0 ] 
+            then
+               difference_detected=0;
             fi
         
-            no_files_in_adds=$(( $no_files_in_adds + 1 ));
+            no_files_in_index=$(( $no_files_in_index + 1 ));
         fi
     done
 
+    # count the number of files in latest commit except the commit_message.txt file
     no_files_in_commit=0;
     for file_check in .girt/commit_"$prev_commit_no"/*
     do
-        no_files_in_commit=$(( $no_files_in_commit + 1 ));
+        file_name=$(basename "$file_check");
+        if [ -f "$file_check" ] && [ "$file_name" != "commit_message.txt" ]
+        then
+            no_files_in_commit=$(( $no_files_in_commit + 1 ));
+        fi
     done
 
-    if [ $(( $no_files_in_commit - $no_files_in_adds )) -ne 1 ]
+    # The difference in number of files should 0 if the index and latest commit are the same
+    if [ $(( $no_files_in_commit - $no_files_in_index )) -ne 0 ]
     then 
-        # echo "no_files in adds = $no_files_in_adds";
-        # echo "no_files in commit = $no_files_in_commit";
-        # echo "there are removed files in adds"
         difference_detected=0;
     fi
     if [ "$difference_detected" = 1 ]
@@ -111,9 +116,11 @@ then
         echo "nothing to commit";
         exit 1;
     fi
+
+# if there is no existing commits then only check if index is empty
 else
     no_files=0;
-    for files in .girt/adds/*
+    for files in .girt/index/*
     do
         if [ -f "$files" ]
         then
@@ -129,21 +136,20 @@ else
 fi
 
 
-#creating a commit sub directory
+# creating a sub directory for a new commit
 mkdir ".girt/commit_"$commit_no"";
 
 
-#copies files from adds into commmit sub directory
-for file in .girt/adds/*
+# Copy all the files from index into commmit sub directory
+for file in .girt/index/*
 do
-    #echo "$file"
     if [ -f "$file" ]
     then
         cp "$file" ".girt/commit_"$commit_no"";
     fi
 done
 
-#create a commit_message.txt for the commit
+# Create a commit_message.txt for the commit message
 if [ $# -eq 2 ]
 then
     echo "$2" > .girt/commit_"$commit_no"/commit_message.txt;
@@ -154,7 +160,7 @@ else
     echo "error: $# -ne 2 or 3"
 fi
 
-#exit with message
+# Exit script with message
 echo "Committed as commit "$commit_no"";
 exit 0;
 
