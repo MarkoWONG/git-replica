@@ -36,6 +36,8 @@ then
                 current_file_name=$(basename "$branch_files");
                 #echo "copying "$current_files" to .girt/branches/"$cwb"/"$current_file_name"";
                 cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
+
+                cp "$current_files" .girt/branches/"$1"/"$current_file_name";
             fi
         done
         #sync the commits asscoicated with that branch
@@ -112,9 +114,10 @@ then
             fi
         done
 
+        echo "difference_detected = "$difference_detected""
         if [ "$difference_detected" -eq 0 ]
         then
-            #echo "difference_detected";
+            echo "difference_detected";
             # update branch (the one we are switching to) with it's own commit
             for branch_files in .girt/branches/"$1"/commit_"$latest_new_b_commit_no"/*
             do
