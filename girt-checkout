@@ -40,69 +40,18 @@ then
                 cp "$current_files" .girt/branches/"$1"/"$current_file_name";
             fi
         done
-        #sync the commits asscoicated with that branch
-        cd .girt;
-        for commit_file in *
-        do
-            #echo "commit file is "$commit_file""
-            if [ -d "$commit_file" ] && echo "$commit_file" | egrep -q '^commit_.*'
-            then 
-                cp -R "$commit_file" branches/"$cwb";
-            fi
-        done
-        cd ..;
 
-        #calculate the latest commit number for the branch we are switching from
+        #calculate the commit number in cwd
         commit_no=0;
-        while [ -d ".girt/branches/"$cwb"/commit_"$commit_no"" ] 
+        while [ -d ".girt/commit_"$commit_no"" ] 
         do
             commit_no=$(( $commit_no + 1 ));
         done
-        latest_cwb_commit_no=$(( $commit_no - 1 ));
 
-        #calculate the latest commit number for the branch we are switching to
-        commit_no=0;
-        while [ -d ".girt/branches/"$1"/commit_"$commit_no"" ] 
-        do
-            commit_no=$(( $commit_no + 1 ));
-        done
-        latest_new_b_commit_no=$(( $commit_no - 1 ));
+        cwb_latest_commit_no=$(( $commit_no - 1 ));
 
-        # detect any the diff between the latest commits of branches
-        difference_detected=1;
-        no_files_in_cwb_commit=0;
-        for file_check in .girt/branches/"$cwb"/commit_"$latest_cwb_commit_no"
-        do
-            if [ -f "$file_check" ]
-            then
-                file_name=$(basename "$file_check");
-                #echo "file_name is "$file_name"";
-                #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
-                diff -s "$file_check" ".girt/branches/"$1"/commit_"$latest_new_b_commit_no"" >/dev/null 2>/dev/null;
-                if [ $? -ne 0 ] #same file content
-                then #1 or 2 so different file content or error like file not found
-                    difference_detected=0;
-                    #echo "Difference detected"
-                fi
-            
-                no_files_in_cwb_commit=$(( $no_files_in_cwb_commit + 1 ));
-            fi
-        done
-
-        # count the number of files in cwd latest commit
-        no_files_in_new_b_commit=0;
-        for file_check in .girt/commit_"$prev_commit_no"/*
-        do
-            if [ -f "$file_check" ]
-            then
-                no_files_in_new_b_commit=$(( $no_files_in_new_b_commit + 1 ));
-            fi
-        done
-
-        if [ $(( $no_files_in_new_b_commit - $no_files_in_cwb_commit )) -ne 0 ]
-        then 
-            difference_detected=0;
-        fi
+        #track the lastest commit within a branch
+        echo "$cwb_latest_commit_no" > .girt/branches/"$cwb"/latest_commit_no.txt;
 
         #remove all files in cwd to be updated with new branch
         for files in ./*
@@ -114,38 +63,39 @@ then
             fi
         done
 
-        echo "difference_detected = "$difference_detected""
-        if [ "$difference_detected" -eq 0 ]
+        # copy files from branch to cwd
+        for branch_files in .girt/branches/"$1"/*
+        do
+            branch_file_name=$(basename "$branch_files");
+            if [ -f "$branch_files" ] && [ "$branch_file_name" != "latest_commit_no.txt" ]
+            then
+                #echo "copying "$branch_files" to ./"$branch_file_name""; 
+                cp "$branch_files" ./"$branch_file_name" ;
+            fi
+        done
+
+        # detect any the diff between the latest commits of branches
+        cwb_commit_no=$(cat .girt/branches/"$cwb"/latest_commit_no.txt);
+        new_commit_no=$(cat .girt/branches/"$1"/latest_commit_no.txt);
+        diff ".girt/branches/"$cwb"/latest_commit_no.txt" ".girt/branches/"$1"/latest_commit_no.txt" >/dev/null 2>/dev/null;
+        if [ $? -ne 0 ]
         then
-            echo "difference_detected";
+            #echo "difference_detected";
+        
             # update branch (the one we are switching to) with it's own commit
-            for branch_files in .girt/branches/"$1"/commit_"$latest_new_b_commit_no"/*
+            for branch_files in .girt/commit_"$new_commit_no"/*
             do
-                if [ -f "$branch_files" ]
+                branch_file_name=$(basename "$branch_files");
+                if [ -f "$branch_files" ] && [ "$branch_file_name" != "commit_message.txt" ]
                 then
-                    branch_file_name=$(basename "$branch_files");
-                    cp "$branch_files" ./"$branch_file_name" ;
-                fi
-            done
-
-        # elif [ diff from all three places  ] 
-        # then 
-        #     echo" error overwrite error";
-        #     exit 1;
-
-        # just switch
-        # sync cwd with the branch you are switching to
-        else 
-            for branch_files in .girt/branches/"$1"/*
-            do
-                if [ -f "$branch_files" ]
-                then
-                    branch_file_name=$(basename "$branch_files");
-                    #echo "copying "$branch_files" to ./"$branch_file_name""; 
                     cp "$branch_files" ./"$branch_file_name" ;
                 fi
             done
         fi
+        # elif [ diff from all three places  ] 
+        # then 
+        #     echo" error overwrite error";
+        #     exit 1;
 
         # update the current working branch
         echo "$1" > .girt/branches/current_working_branch.txt;

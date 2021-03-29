@@ -52,6 +52,15 @@ then
     else
         mkdir .girt/branches/"$1";
         # echo "making branch "$1"";
+        #calculate the commit number in cwd
+        commit_no=0;
+        while [ -d ".girt/commit_"$commit_no"" ] 
+        do
+            commit_no=$(( $commit_no + 1 ));
+        done
+
+        latest_commit_no=$(( $commit_no - 1 ));
+        echo "$latest_commit_no" > .girt/branches/"$1"/latest_commit_no.txt;
         #copy all files in the cwb into new branch
         for file in *
         do
@@ -61,16 +70,6 @@ then
             fi
         done
 
-        cd .girt;
-        for commit_file in *
-        do
-            #echo "commit file is "$commit_file""
-            if [ -d "$commit_file" ] && echo "$commit_file" | egrep -q '^commit_.*'
-            then 
-                cp -R "$commit_file" branches/"$1";
-            fi
-        done
-        cd ..;
     fi
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] &&  echo "$2" | egrep -q '^[a-zA-Z].*'
 then
