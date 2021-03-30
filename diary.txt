@@ -12,3 +12,4 @@ Date	    Start	Stop	Activity	        Comments
 26/03/21    14:00   22:17   coding              coded branch and checkout and some of merge.
 29/03/21    10:00   20:00   coding/debugging    recoded girt checkout 3 times and still going wrong
 29/03/21    20:00   23:15   style checking      Redid the style of init,add,commit,log,rm,show,status
+30/03/21    20:00   23:05   Style correcting    Redid the style of all files

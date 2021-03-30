@@ -1,26 +1,31 @@
 #!/bin/dash
+# Written by Marko Wong (z5309371)
+# Girt-merge adds the changes that have been made to the specified branch or 
+# commit to the index, and commits them
 
+# Error check: There must be an existing .girt repository
 if [ -d .girt ]
 then :
 else 
-    echo "girt-commit: error: girt repository directory .girt not found"
+    echo "girt-merge: error: girt repository directory .girt not found"
     exit 1;
 fi
 
+# Error check: There must be an existing commit
 if [ -d .girt/commit_0 ]
 then
     :
 else
-    echo "girt-branch: error: this command can not be run until after the first commit"
+    echo "girt-merge: error: this command can not be run until after the first commit"
     exit 1;
 fi
 
+# Error cases
 if [ $# -eq 1 ]
 then
     echo "girt-merge: error: empty commit message";
     exit 1;
 fi
-
 if [ $# -ne 3 ]
 then 
     echo "usage: girt-merge <branch|commit> -m message";
@@ -43,4 +48,4 @@ else
 fi
 
 
-
+exit 0;

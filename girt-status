@@ -1,45 +1,53 @@
 #!/bin/dash
+# Written By Marko Wong (z5309371)
+# Girt-status shows the status of files in the current directory, the index, 
+# and the repository.
 
+# () to pass the output into sort
 (
-#calculate the commit number
+
+# Calculate the latest commit number
 commit_no=0;
 while [ -d ".girt/commit_"$commit_no"" ] 
 do
     commit_no=$(( $commit_no + 1 ));
 done
-
 latest_commit_no=$(( $commit_no - 1 ));
 
+# Check the status of every file in cwd
 for file in *
 do
     if [ -f "$file" ]
     then
         if [ -f .girt/index/"$file" ] && [ -f .girt/commit_"$latest_commit_no"/"$file" ]
         then
+            # Keeps track of which diff is detected, 0 for detected and 1 for undetected
             index_diff_repo=1;
             cwd_diff_repo=1;
             cwd_diff_index=1;
-            # checking for unsaved changes in .girt/index (#index vs commit)
+
+            # checking for difference between index and latest commit
             diff -s ".girt/index/"$file"" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 index_diff_repo=0;
             fi
 
-            # checking for unsaved changes in cwd  (#cwd vs commit)
+            # checking for difference between cwd and latest commit
             diff -s "./"$file"" ".girt/commit_"$latest_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ] 
             then 
                 cwd_diff_repo=0; 
             fi
 
-            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            # checking for difference between index and cwd
             diff -s "./"$file"" ".girt/index/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 cwd_diff_index=0; 
             fi
 
+            # Print the status of files based on the differences detected
             if [ "$index_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_index" -eq 0 ]
             then 
                 echo ""$file" - file changed, different changes staged for commit";
@@ -57,8 +65,9 @@ do
 
         elif [ -f .girt/index/"$file" ]
         then 
+            # checking for difference between index and cwd
             diff -s "./"$file"" ".girt/index/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ] 
             then 
                 echo ""$file" - added to index, file changed";
             else
@@ -73,7 +82,7 @@ do
     fi
 done 
 
-#check files that are not in cwd but in index
+# Check files that are not in cwd but in index
 for index_file in .girt/index/*
 do
     index_file_name=$(basename "$index_file");
@@ -81,11 +90,11 @@ do
     then
         :
     else
-        #echo "checking "$index_file_name"";
         if [ -f .girt/index/"$index_file_name" ] && [ -f .girt/commit_"$latest_commit_no"/"$index_file_name" ]
         then
+            # checking for difference between index and latest commit
             diff -s ".girt/index/"$index_file_name"" ".girt/commit_"$latest_commit_no"/"$index_file_name"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 echo ""$index_file_name" - file deleted, different changes staged for commit";
             else
@@ -98,7 +107,7 @@ do
     fi
 done 
 
-#check files that are only in the latest commit
+# Check files that are only in the latest commit
 for commit_file in .girt/commit_"$latest_commit_no"/*
 do
     commit_file_name=$(basename "$commit_file");
@@ -106,11 +115,11 @@ do
     then
         :
     else
-        #echo "checking "$commit_file_name"";
         if [ -f .girt/commit_"$latest_commit_no"/"$commit_file_name" ]
         then
             echo ""$commit_file_name" - deleted";
         fi
     fi
 done 
-)|sort
+)|sort;
+exit 0;

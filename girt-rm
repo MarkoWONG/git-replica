@@ -1,5 +1,8 @@
 #!/bin/dash
+# Written by Marko Wong (z5309371)
+# Girt-rm removes a file from the index, or from the current directory and the index.
 
+# Error check: There must be an existing .girt repository
 if [ -d .girt ]
 then :
 else 
@@ -7,7 +10,7 @@ else
     exit 1;
 fi
 
-# usage check
+# Usage check
 if [ $# -lt 1 ]
 then
     echo "usage: girt-rm [--force] [--cached] <filenames>";
@@ -22,48 +25,49 @@ then
     exit 1;
 fi
 
-#calculate the commit number
+# Calculate the prev commit number and next commit number
 commit_no=0;
 while [ -d ".girt/commit_"$commit_no"" ] 
 do
     commit_no=$(( $commit_no + 1 ));
 done
-
 prev_commit_no=$(( $commit_no - 1 ));
 
-# remove specified file from index
 for file in $@
 do
+    # Detect any differences between index vs cwd vs repo
     if [ -f .girt/index/"$file" ] || [ -f .girt/commit_"$prev_commit_no"/"$file" ] 
     then 
+        # Keeps track of which diff is detected, 0 for detected and 1 for undetected
         index_diff_repo=1;
         cwd_diff_repo=1;
         cwd_diff_index=1;
 
-        # normal checking
+        # Checking when no options are specified
         if [ "$1" != "--force" ] && [ "$1" != "--cached" ] && [ "$2" != "--cached" ]
         then
-            # checking for unsaved changes in .girt/index (#index vs commit)
+            # checking for difference between index and latest commit
             diff -s ".girt/index/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 index_diff_repo=0;
             fi
 
-            # checking for unsaved changes in cwd  (#cwd vs commit)
+            # checking for difference between cwd and latest commit
             diff -s "./"$file"" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 cwd_diff_repo=0; 
             fi
 
-            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            # checking for difference between index and cwd
             diff -s "./"$file"" ".girt/index/$file" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 cwd_diff_index=0; 
             fi
 
+            # Prevent the loss of unsaved work
             if [ $index_diff_repo = 0 ] && [ $cwd_diff_repo = 0 ] && [ $cwd_diff_index = 0 ]
             then 
                 echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
@@ -80,23 +84,24 @@ do
             fi
         fi
 
-        # checking for cached option
+        # Checks when cached option is used
         if [ "$1" != "--force" ]
         then
-            # checking for unsaved changes in .girt/index (#index vs commit)
+            # checking for difference between index and latest commit
             diff -s ".girt/index/$file" ".girt/commit_"$prev_commit_no"/"$file"" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 index_diff_repo=0;
             fi
 
-            # checking for unsaved changes in .girt/index  (#cwd vs index)
+            # checking for difference between index and cwd
             diff -s "./"$file"" ".girt/index/$file" >/dev/null 2>/dev/null;
-            if [ $? -ne 0 ] # NOT same file content
+            if [ $? -ne 0 ]
             then 
                 cwd_diff_index=0;
             fi
 
+            # Prevent the loss of unsaved work
             if [ $index_diff_repo = 0 ] && [ $cwd_diff_index = 0 ]
             then 
                 echo "girt-rm: error: '"$file"' in index is different to both to the working file and the repository";
@@ -105,12 +110,11 @@ do
         fi
     fi
 
+    # Remove specified file from index
     if [ -f .girt/index/"$file" ]
     then
-    
-        # remove file
-        #echo "removing ./girt/index/"$file"";
         rm .girt/index/"$file";
+
     elif [ "$file" != '--force' ] && [ "$file" != '--cached' ] 
     then
         echo "girt-rm: error: '"$file"' is not in the girt repository";    
@@ -119,15 +123,13 @@ do
     
     # If the --cached option is specified, the file is removed only from the index, 
     # and not from the current directory.
-    if [ "$1" = "--cached" ] || [ "$2" = "--cached" ]  
+    if [ "$1" != "--cached" ] && [ "$2" != "--cached" ]  
     then
-        :
-    else
+        # Remove specified file from cwd 
         if [ -f ./"$file" ]
         then
-            #echo "removing ./"$file"";
             rm ./"$file";
         fi
     fi
-
 done
+exit 0;

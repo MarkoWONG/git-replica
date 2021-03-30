@@ -1,12 +1,17 @@
 #!/bin/dash
+# Written by Marko Wong (z5309371)
+# Girt-branch either creates a branch, deletes a branch, or lists current branch names.
 
+# Error check: There must be an existing .girt repository
 if [ -d .girt ]
-then :
+then 
+    :
 else 
-    echo "girt-commit: error: girt repository directory .girt not found"
+    echo "girt-branch: error: girt repository directory .girt not found"
     exit 1;
 fi
 
+# Error check: There must be an existing commit
 if [ -d .girt/commit_0 ]
 then
     :
@@ -15,9 +20,9 @@ else
     exit 1;
 fi
 
+# list all branches if no arguments are passed in
 if [ $# -eq 0 ]
 then 
-    #list branches
     (for branches in .girt/branches/*
     do
         if [ -d "$branches" ]
@@ -27,6 +32,7 @@ then
         fi
     done )|sort;
 
+# Error cases
 elif [ $# -eq 1 ] && [ "$1" = "-d" ]
 then 
     echo "error girt-branch: error: branch name required";
@@ -42,17 +48,18 @@ then
     echo "girt-branch: error: invalid branch name '"$1"'";
     exit 1;
 
+# create a branch named arccording to first argument
 elif [ $# -eq 1 ]
 then 
-    #create that branch
+    # Branch name have to be unique
     if [ -d .girt/branches/"$1" ]
     then 
         echo "girt-branch: error: branch '"$1"' already exists";
         exit 1;
     else
         mkdir .girt/branches/"$1";
-        # echo "making branch "$1"";
-        #copy all files in the cwb into new branch
+
+        # Copy all files in the cwb into new branch
         for file in *
         do
             if [ -f "$file" ]
@@ -61,10 +68,11 @@ then
             fi
         done
 
+        # Copy all existing commits into new branch
         cd .girt;
         for commit_file in *
         do
-            #echo "commit file is "$commit_file""
+            # Copy all commits contents into new branch
             if [ -d "$commit_file" ] && echo "$commit_file" | egrep -q '^commit_.*'
             then 
                 cp -R "$commit_file" branches/"$1";
@@ -72,13 +80,16 @@ then
         done
         cd ..;
     fi
+
+# Delete branch when "-d" option is used
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] &&  echo "$2" | egrep -q '^[a-zA-Z].*'
 then
-    #delete that branch
     if [ -d .girt/branches/"$2" ] && [ "$2" != "master" ]
     then 
         echo "Deleted branch '"$2"'";
         rm -r .girt/branches/"$2";
+
+    # Can't delete the master branch
     elif [ "$2" = "master" ]
     then
         echo "girt-branch: error: can not delete branch 'master'"
@@ -87,6 +98,8 @@ then
         echo "girt-branch: error: branch '"$2"' doesn't exist";
         exit 1;
     fi
+
+# Branch name have to start with a letter
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] && echo "$2" | egrep -q '^[^a-zA-Z].*'
 then 
     echo "girt-branch: error: invalid branch name '"$2"'";
@@ -96,3 +109,5 @@ else
     echo "usage: girt-branch [-d] <branch>";
     exit 1;
 fi
+
+exit 0;

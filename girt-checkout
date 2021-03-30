@@ -1,34 +1,41 @@
 #!/bin/dash
+# Written by Marko Wong (z5309371)
+# Girt-checkout switches branches.
 
+# Error check: There must be an existing .girt repository
 if [ -d .girt ]
-then :
+then 
+    :
 else 
-    echo "girt-commit: error: girt repository directory .girt not found"
+    echo "girt-checkout: error: girt repository directory .girt not found"
     exit 1;
 fi
 
+# Error check: There must be an existing commit
 if [ -d .girt/commit_0 ]
 then
     :
 else
-    echo "girt-branch: error: this command can not be run until after the first commit"
+    echo "girt-checkout: error: this command can not be run until after the first commit"
     exit 1;
 fi
 
 if [ $# -eq 1 ]
 then
+    # Extract the current working branch(cwb)
     cwb=$(cat .girt/branches/current_working_branch.txt);
-    #echo "switch from "$cwb"";
-    # valid branch
+    
+    # Check if argument is a valid branch
     if [ -d .girt/branches/"$1" ]
     then 
+        # Check if already on cwb
         if [ "$1" = "$cwb" ]
         then
             echo "Already on '"$1"'";
             exit 1;
         fi
     
-        # sync the branch you are swtiching from with cwd
+        # Copy all files in cwd to cwb (saving work done on the branch)
         for current_files in ./*
         do
             if [ -f "$current_files" ]
@@ -40,7 +47,8 @@ then
                 #cp "$current_files" .girt/branches/"$1"/"$current_file_name";
             fi
         done
-        #sync the commits asscoicated with that branch
+
+        # Copy all commits in cwd to cwb (saving work done on the branch)
         cd .girt;
         for commit_file in *
         do
@@ -52,7 +60,7 @@ then
         done
         cd ..;
 
-        #calculate the latest commit number for the branch we are switching from
+        # Calculate the latest commit number for the branch we are switching from
         commit_no=0;
         while [ -d ".girt/branches/"$cwb"/commit_"$commit_no"" ] 
         do
@@ -60,7 +68,7 @@ then
         done
         latest_cwb_commit_no=$(( $commit_no - 1 ));
 
-        #calculate the latest commit number for the branch we are switching to
+        # Calculate the latest commit number for the branch we are switching to
         commit_no=0;
         while [ -d ".girt/branches/"$1"/commit_"$commit_no"" ] 
         do
@@ -68,7 +76,7 @@ then
         done
         latest_new_b_commit_no=$(( $commit_no - 1 ));
 
-        # detect any the diff between the latest commits of branches
+        # Detect any the diff between the latest commits of branches
         difference_detected=1;
         no_files_in_cwb_commit=0;
         for file_check in .girt/branches/"$cwb"/commit_"$latest_cwb_commit_no"
@@ -78,6 +86,7 @@ then
                 file_name=$(basename "$file_check");
                 #echo "file_name is "$file_name"";
                 #echo "comparing "$file_check"  to .girt/commit_"$prev_commit_no"/"$file_name"";
+                # Compare the latest commits between the two branches
                 diff -s "$file_check" ".girt/branches/"$1"/commit_"$latest_new_b_commit_no"" >/dev/null 2>/dev/null;
                 if [ $? -ne 0 ] #same file content
                 then #1 or 2 so different file content or error like file not found
@@ -89,7 +98,7 @@ then
             fi
         done
 
-        # count the number of files in cwd latest commit
+        # Count the number of files in cwd latest commit
         no_files_in_new_b_commit=0;
         for file_check in .girt/commit_"$prev_commit_no"/*
         do
@@ -99,12 +108,13 @@ then
             fi
         done
 
+        # Difference is dectected if the number of files in the commits don't match
         if [ $(( $no_files_in_new_b_commit - $no_files_in_cwb_commit )) -ne 0 ]
         then 
             difference_detected=0;
         fi
 
-        #remove all files in cwd to be updated with new branch
+        # Remove all files in cwd to be updated with new branch
         for files in ./*
         do
             if [ -f "$files" ]
@@ -114,7 +124,7 @@ then
             fi
         done
 
-        # copy files from branch to cwd
+        # Copy all files from branch to cwd
         for branch_files in .girt/branches/"$1"/*
         do
             branch_file_name=$(basename "$branch_files");
@@ -126,10 +136,11 @@ then
         done
 
         #echo "difference_detected = "$difference_detected""
+        # if the latest commit between the 2 branches are different then overwrite
+        # the files in cwd with the lastest commit from the branch we are swtiching to
         if [ "$difference_detected" -eq 0 ]
         then
             #echo "difference_detected";
-        
             # update branch (the one we are switching to) with it's own commit
             for branch_files in .girt/commit_"$new_commit_no"/*
             do
@@ -150,9 +161,12 @@ then
         # update the current working branch
         echo "$1" > .girt/branches/current_working_branch.txt;
         echo "Switched to branch '"$1"'";
+        exit 0;
     else
         echo "girt-checkout: error: unknown branch '"$1"'";
+        exit 1;
     fi
 else
     echo "usage: girt-checkout <branch>"
+    exit 1;
 fi
