@@ -100,7 +100,7 @@ then
     for file_check in .girt/commit_"$prev_commit_no"/*
     do
         file_name=$(basename "$file_check");
-        if [ -f "$file_check" ] && [ "$file_name" != "commit_message.txt" ]
+        if [ -f "$file_check" ] && [ "$file_name" != "commit_message.txt" ] && [ "$file_name" != "commit_owner.txt" ]
         then
             no_files_in_commit=$(( $no_files_in_commit + 1 ));
         fi
@@ -159,6 +159,12 @@ then
 else
     echo "error: $# -ne 2 or 3"
 fi
+
+# Extract the current working branch(cwb)
+cwb=$(cat .girt/branches/current_working_branch.txt);
+
+# Keep track of which branch created this commit
+echo "$cwb" > .girt/commit_"$commit_no"/commit_owner.txt;
 
 # Exit script with message
 echo "Committed as commit "$commit_no"";

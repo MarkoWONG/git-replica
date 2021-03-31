@@ -68,17 +68,31 @@ then
             fi
         done
 
-        # Copy all existing commits into new branch
-        cd .girt;
-        for commit_file in *
+        # Calculate the prev commit number and next commit number
+        commit_no=0;
+        while [ -d ".girt/commit_"$commit_no"" ] 
         do
-            # Copy all commits contents into new branch
-            if [ -d "$commit_file" ] && echo "$commit_file" | egrep -q '^commit_.*'
-            then 
-                cp -R "$commit_file" branches/"$1";
-            fi
+            commit_no=$(( $commit_no + 1 ));
         done
-        cd ..;
+
+        latest_commit_no=$(( $commit_no - 1 ));
+
+        # Record the latest commit when the new branch is created
+        #echo "$latest_commit_no" > .girt/branches/"$1"/latest_commit.txt;
+
+        # Extract the current working branch(cwb)
+        cwb=$(cat .girt/branches/current_working_branch.txt);
+
+        # Record the latest commit of the current branch for the new branch
+        # Which is not possible until the first checkout so just fetch the latest commit in cwd
+        if [ -f ".girt/branches/"$cwb"/latest_commit.txt" ]
+        then
+            latest_cwb_commit_no=$(cat .girt/branches/"$cwb"/latest_commit.txt);
+            echo "$latest_cwb_commit_no" > .girt/branches/"$1"/latest_commit.txt;
+        else 
+            echo "$latest_commit_no" > .girt/branches/"$1"/latest_commit.txt;
+        fi
+        
     fi
 
 # Delete branch when "-d" option is used

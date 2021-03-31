@@ -111,7 +111,10 @@ done
 for commit_file in .girt/commit_"$latest_commit_no"/*
 do
     commit_file_name=$(basename "$commit_file");
-    if [ -f ./"$commit_file_name" ] || [ -f .girt/index/"$commit_file_name" ] || [ "$commit_file_name" = "commit_message.txt" ]
+    if [ -f ./"$commit_file_name" ] || 
+    [ -f .girt/index/"$commit_file_name" ] || 
+    [ "$commit_file_name" = "commit_message.txt" ] || 
+    [ "$commit_file_name" = "commit_owner.txt" ] 
     then
         :
     else
