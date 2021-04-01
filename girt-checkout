@@ -102,9 +102,12 @@ then
         new_b_file_name=$(basename "$new_b_file");
         if [ -f "$new_b_file" ] && [ "$new_b_file_name" != "commit_message.txt" ] && [ "$new_b_file_name" != "commit_owner.txt" ] 
         then 
-            #overwrite file with new_b_commit
+            #overwrite file with new_b_commit for cwd
             #echo ""$new_b_file" --> ./"$new_b_file_name""; 
             cp "$new_b_file" ./"$new_b_file_name"
+            
+            ##overwrite file with new_b_commit for index
+            cp "$new_b_file" .girt/index/"$new_b_file_name"
         fi 
     done
 
@@ -120,6 +123,10 @@ then
             #echo "removed ./"$cwb_file_name"";
             rm ./"$cwb_file_name";
             rm .girt/branches/"$1"/"$cwb_file_name";
+            if [ -f .girt/index/"$new_b_file_name" ]
+            then
+                rm .girt/index/"$new_b_file_name";
+            fi
         fi 
     done
 fi

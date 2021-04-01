@@ -3,16 +3,35 @@
 # Girt-status shows the status of files in the current directory, the index, 
 # and the repository.
 
+# Error check: There must be an existing .girt repository
+if [ -d .girt ]
+then 
+    :
+else 
+    echo "girt-show: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
 # () to pass the output into sort
 (
 
-# Calculate the latest commit number
-commit_no=0;
-while [ -d ".girt/commit_"$commit_no"" ] 
-do
-    commit_no=$(( $commit_no + 1 ));
-done
-latest_commit_no=$(( $commit_no - 1 ));
+# Extract the current working branch(cwb)
+cwb=$(cat .girt/branches/current_working_branch.txt);
+
+# Fetch the lastest commit in the cwb
+if [ -f ".girt/branches/"$cwb"/latest_commit.txt" ]
+then
+    latest_commit_no=$(cat .girt/branches/"$cwb"/latest_commit.txt);
+else 
+    # Which is not possible until the first checkout so just fetch the latest commit in cwd
+    commit_no=0;
+    while [ -d ".girt/commit_"$commit_no"" ] 
+    do
+        commit_no=$(( $commit_no + 1 ));
+    done
+
+    latest_commit_no=$(( $commit_no - 1 ));
+fi
 
 # Check the status of every file in cwd
 for file in *
