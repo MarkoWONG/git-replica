@@ -21,7 +21,7 @@ else
 fi
 
 # Error cases
-if [ $# -eq 1 ]
+if [ $# -eq 1 ] || [ $# -eq 2 ]
 then
     echo "girt-merge: error: empty commit message";
     exit 1;
@@ -31,21 +31,61 @@ then
     echo "usage: girt-merge <branch|commit> -m message";
     exit 1;
 elif [ "$2" != "-m" ]
+then
     echo "usage: girt-merge <branch|commit> -m message";
     exit 1;
 fi
 
-# all commits can be accessed anywhere 
-# index is synced with branch along with cwd
-# no new commit is created
-if [ -d .girt/"$1" ] || [ -d .girt/branches/"$1" ]
+#Determine if the merge source is a commit or a branch
+# For commit
+if [ -d .girt/"$1" ] && echo "$1" | egrep -q '^[0-9]*$'
 then
-    if [ -d .girt/"$1" ] && [ "$1" != "adds" ]
-    then
-
+    source_path=.girt/"$1";
+elif echo "$1" | egrep -q '^[0-9]*$'
+then
+    echo "girt-merge: error: unknown commit '"$1"'";
+    exit 1;
+# For branch
+elif [ -d .girt/branches/"$1" ]
+then
+    source_path=.girt/branches/"$1";
 else 
-    echo "girt-merge: error: unknown branch '"$1"'"
+    echo "girt-merge: error: unknown branch '"$1"'";
+    exit 1;
 fi
 
+# add the changes to index
+# Extract the current working branch(cwb)
+cwb=$(cat .girt/branches/current_working_branch.txt);
 
+#copy all files in branch to cwb
+for files in "$source_path"
+do 
+    file_name=$(basename "$files");
+    # if file exists in cwd(instead of cwb as cwd id more up to date) and branch then ...
+    if [ -f "$files" ] && [ -f ./"$file_name" ]
+    then
+        :
+    elif [ -f "$files" ]
+    then 
+        # add the changes to cwd
+        cp "$files" "./"$file_name"";
+        # add the changes to index
+        cp "$files" ".girt/index/"$file_name"";
+    fi 
+    echo" Fast-forward: no commit created";
+done
+
+
+# update the latest commit (if necessary) of cwb
+if echo "$1" | egrep -q '^[^0-9]'
+then
+    branch_commit=$(cat .girt/branches/"$1"/latest_commit.txt);
+    cwb_commit=$(cat .girt/branches/"$cwb"/latest_commit.txt);
+    #if the deleting branch latest commit is more recent than the others then error
+    if [ "$branch_commit" -gt "$cwb_commit" ]
+    then 
+        echo "$branch_commit" > .girt/branches/"$cwb"/latest_commit.txt;
+    fi
+fi
 exit 0;
