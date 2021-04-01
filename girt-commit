@@ -51,9 +51,9 @@ if [ "$1" = "-a" ]
 then 
     for index_files in .girt/index/*
     do
-        if [ -f "$index_files" ]
+        f_name=$(basename "$index_files");
+        if [ -f "$index_files" ] && [ -f ./"$f_name" ]
         then
-            f_name=$(basename "$index_files");
             cp ./"$f_name" ".girt/index";
         fi
     done
