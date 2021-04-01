@@ -95,13 +95,14 @@ then
         
     fi
 
-# Delete branch when "-d" option is used
+# Error checking for deleting a branch
+# We can assume the user is on a different branch when deleting a branch
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] &&  echo "$2" | egrep -q '^[a-zA-Z].*'
 then
+
     if [ -d .girt/branches/"$2" ] && [ "$2" != "master" ]
     then 
-        echo "Deleted branch '"$2"'";
-        rm -r .girt/branches/"$2";
+        :
 
     # Can't delete the master branch
     elif [ "$2" = "master" ]
@@ -112,6 +113,36 @@ then
         echo "girt-branch: error: branch '"$2"' doesn't exist";
         exit 1;
     fi
+
+    #cycle through the branches latest commit and record the most recent commit
+    most_recent_commit=0;
+    for branch_file in .girt/branches/*
+    do
+        branch_file_name=$(basename "$branch_file");
+        if [ -d "$branch_file" ] && 
+        [ -f "$branch_file/latest_commit.txt" ] && 
+        [ "$branch_file_name" != "$2" ]
+        then
+            branch_commit=$(cat "$branch_file/latest_commit.txt");
+            if [ "$branch_commit" -gt "$most_recent_commit" ]
+            then
+                most_recent_commit="$branch_commit";
+            fi
+        fi 
+    done
+
+    deleting_b_commit=$(cat .girt/branches/"$2"/latest_commit.txt);
+
+    #if the deleting branch latest commit is more recent than the others then error
+    if [ "$deleting_b_commit" -gt "$most_recent_commit" ]
+    then 
+        echo "girt-branch: error: branch '"$2"' has unmerged changes";
+        exit 1;
+    fi
+
+    # Delete branch when "-d" option is used
+    echo "Deleted branch '"$2"'";
+    rm -r .girt/branches/"$2";
 
 # Branch name have to start with a letter
 elif [ $# -eq 2 ] && [ "$1" = "-d" ] && echo "$2" | egrep -q '^[^a-zA-Z].*'
