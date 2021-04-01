@@ -46,7 +46,7 @@ then
     exit 1;
 fi
 
-# Copy all files in the current working directory (cwd) to index sub directory
+#Copy all files in the current working directory (cwd) to index sub directory
 if [ "$1" = "-a" ]
 then 
     for index_files in .girt/index/*
@@ -54,7 +54,7 @@ then
         if [ -f "$index_files" ]
         then
             f_name=$(basename "$index_files");
-            cp "$f_name" ".girt/index";
+            cp ./"$f_name" ".girt/index";
         fi
     done
 fi

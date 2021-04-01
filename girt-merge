@@ -65,14 +65,16 @@ do
     # if file exists in cwd(instead of cwb as cwd id more up to date) and branch then ...
     if [ -f "$files" ] && [ -f ./"$file_name" ] && [ "$file_name" != "latest_commit.txt" ]
     then
-        :
+        # add the changes to cwd
+        cp "$files" "./"$file_name"";
+        # add the changes to index
+        cp "$files" ".girt/index/"$file_name"";
+
     elif [ -f "$files" ] && [ "$file_name" != "latest_commit.txt" ]
     then 
         # add the changes to cwd
-        #echo ""$files" -> ./"$file_name"";
         cp "$files" "./"$file_name"";
         # add the changes to index
-        #echo ""$files" -> .girt/index/"$file_name"";
         cp "$files" ".girt/index/"$file_name"";
     fi 
 done
