@@ -110,6 +110,19 @@ do
         fi
     fi
 
+    # check if file is in index
+    if [ -f .girt/index/"$file" ]
+    then
+        :
+    elif [ "$file" != '--force' ] && [ "$file" != '--cached' ] 
+    then
+        echo "girt-rm: error: '"$file"' is not in the girt repository";    
+        exit 1;
+    fi
+done
+
+for file in $@
+do
     # Remove specified file from index
     if [ -f .girt/index/"$file" ]
     then
@@ -131,5 +144,5 @@ do
             rm ./"$file";
         fi
     fi
-done
+done;
 exit 0;
