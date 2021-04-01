@@ -59,23 +59,24 @@ fi
 cwb=$(cat .girt/branches/current_working_branch.txt);
 
 #copy all files in branch to cwb
-for files in "$source_path"
+for files in "$source_path"/*
 do 
     file_name=$(basename "$files");
     # if file exists in cwd(instead of cwb as cwd id more up to date) and branch then ...
-    if [ -f "$files" ] && [ -f ./"$file_name" ]
+    if [ -f "$files" ] && [ -f ./"$file_name" ] && [ "$file_name" != "latest_commit.txt" ]
     then
         :
-    elif [ -f "$files" ]
+    elif [ -f "$files" ] && [ "$file_name" != "latest_commit.txt" ]
     then 
         # add the changes to cwd
+        #echo ""$files" -> ./"$file_name"";
         cp "$files" "./"$file_name"";
         # add the changes to index
+        #echo ""$files" -> .girt/index/"$file_name"";
         cp "$files" ".girt/index/"$file_name"";
     fi 
-    echo" Fast-forward: no commit created";
 done
-
+echo "Fast-forward: no commit created";
 
 # update the latest commit (if necessary) of cwb
 if echo "$1" | egrep -q '^[^0-9]'
