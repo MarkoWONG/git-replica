@@ -3,7 +3,11 @@
 # Girt-init setups an empty repository
 
 # There can only be one .girt repository per directory
-if [ -d ".girt" ] 
+if [ $# != 0 ]
+then 
+    echo "usage: girt-init"
+    exit 1;
+elif [ -d ".girt" ] 
 then 
     echo "girt-init: error: .girt already exists"
     exit 1;
