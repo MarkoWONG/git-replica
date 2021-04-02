@@ -2,14 +2,8 @@
 # Written By Marko Wong (z5309371)
 # Girt-add will add files to be tracked by the repository
 
-# Error check: There must be at least one argument called with the script 
-if [ $# -lt 1 ]
-then
-    echo "usage: girt-add <filenames>"
-    exit 1;
-fi
-# Error check: There must be an existing .girt repository and a sub directory called index
-if [ -d .girt ] || [ -d .girt/index ]
+# Error check: There must be an existing .girt repository
+if [ -d .girt ]
 then 
     for file in $@
     do
@@ -25,6 +19,13 @@ then
     done
 else
     echo "girt-add: error: girt repository directory .girt not found"
+    exit 1;
+fi
+
+# Error check: There must be at least one argument called with the script 
+if [ $# -lt 1 ]
+then
+    echo "usage: girt-add <filenames>"
     exit 1;
 fi
 
