@@ -1,5 +1,5 @@
 #!/bin/dash
-
+# Test script for girt-init
 # Line 5,8,11 are from lecture code
 # Make a temp directory for testing
 test_dir=$(mktemp -d /tmp/dir.XXXXXXXXXX)
@@ -27,11 +27,13 @@ cd "$test_dir" || exit 1
     echo $?
     ./girt-init a asf afsf
     echo $?
+    # Test for first sucessful creation of a repo
     ./girt-init
     echo $?
     # Test error messages order
     ./girt-init a 3 afsf
     echo $?
+    # Test prevention of more than one repo per directory
     ./girt-init 
     echo $?
 ) >>"output.txt" 2>>"output.txt"
