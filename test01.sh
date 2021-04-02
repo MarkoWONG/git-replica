@@ -21,7 +21,7 @@ cd "$test_dir" || exit 1
 
 # Begin tests:
 (
-# Test for a non-existent .girt repo
+    # Test for a non-existent .girt repo
     ./girt-add
     echo $?
     ./girt-init 
