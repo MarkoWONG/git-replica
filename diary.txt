@@ -16,4 +16,4 @@ Date	    Start	Stop	Activity	        Comments
 31/03/21    15:00   23:00   coding              Redesign the system for checkout once again
 01/03/21    16:00   23:00   coding              Coded the intial versions of merge
 02/04/21    09:00   12:00   testing             Wrote test script template and wrote 2 test scripts of init and add
-03/04/21    18:00           testing             Wrote test script for commit, log and show
+03/04/21    18:00   23:00   testing             Wrote test script for commit, log and show

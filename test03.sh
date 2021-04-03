@@ -22,8 +22,10 @@ cd "$test_dir" || exit 1
 # Begin tests:
 (
     # Test for a non-existent .girt repo
-    ./girt-commit
+    ./girt-log
     echo $?
+
+
 ) >>"output.txt" 2>>"output.txt"
 
 mkdir "solution"
@@ -37,10 +39,10 @@ diff -s "output.txt" "solution/sol.txt" >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     GREEN='\033[0;32m';
-    echo "Test girt- -${GREEN}PASSED${NC}"
+    echo "Test girt-log -${GREEN}PASSED${NC}"
 else
     RED='\033[0;31m';
-    echo "Test girt- -${RED}FAILED${NC}"
+    echo "Test girt-log -${RED}FAILED${NC}"
     echo "<<<<<< Your answer on the left <<<<<<<                          >>>>>> Solution on the right >>>>>>>>"
     diff -y "output.txt" "solution/sol.txt"
 fi
