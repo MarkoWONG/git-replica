@@ -114,7 +114,7 @@ then
     if [ "$difference_detected" = 1 ]
     then
         echo "nothing to commit";
-        exit 1;
+        exit 0;
     fi
 
 # if there is no existing commits then only check if index is empty
@@ -131,7 +131,7 @@ else
     if [ $no_files -eq 0 ]
     then 
         echo "nothing to commit"
-        exit 1;
+        exit 0;
     fi
 fi
 

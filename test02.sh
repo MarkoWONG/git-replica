@@ -27,37 +27,51 @@ cd "$test_dir" || exit 1
     ./girt-init
     # Test for usage cases
     ./girt-commit -a -m 3 4
+    echo $?
     ./girt-commit -d -m
+    echo $?
     ./girt-commit -m 
+    echo $?
     ./girt-commit -a m 
+    echo $?
     ./girt-commit -a -m ''
+    echo $?
     ./girt-commit -m 
+    echo $?
     ./girt-commit -m '    '
+    echo $?
     # Test for nothing to commit 
     ./girt-commit -a -m 'commit-message'
+    echo $?
     ./girt-commit -m 'commit-message'
+    echo $?
     echo hello > a 
     # sucessful commit
     ./girt-add a 
     ./girt-commit -m 'commit-message'
+    echo $?
     ./girt-show 0:a
     # No changes committed even when there is other files in cwd
     echo hello world > b
     ./girt-add a 
     ./girt-commit -m 'commit-message'
+    echo $?
     ./girt-show 0:b
     # Test removed file with other files still in commit
     ./girt-add b 
     ./girt-commit -m 'commit-message'
+    echo $?
     rm a 
     ./girt-add a 
     ./girt-commit -m 'commit-message'
+    echo $?
     ./girt-show 2:a
     ./girt-show 2:b
     # Test for -a option which only updates files previously in index
     touch c 
     echo "line 3" >> b;
     ./girt-commit -a -m 'commit-message'
+    echo $?
     ./girt-show 2:b
     ./girt-show 2:c
 
@@ -72,37 +86,51 @@ cd "solution"
     2041 girt-init
     # Test for usage cases
     2041 girt-commit -a -m 3 4
+    echo $?
     2041 girt-commit -d -m
+    echo $?
     2041 girt-commit -m 
+    echo $?
     2041 girt-commit -a m 
+    echo $?
     2041 girt-commit -a -m ''
+    echo $?
     2041 girt-commit -m 
+    echo $?
     2041 girt-commit -m '    '
+    echo $?
     # Test for nothing to commit 
     2041 girt-commit -a -m 'commit-message'
+    echo $?
     2041 girt-commit -m 'commit-message'
+    echo $?
     echo hello > a 
     # sucessful commit
     2041 girt-add a 
     2041 girt-commit -m 'commit-message'
+    echo $?
     2041 girt-show 0:a
     # No changes committed even when there is other files in cwd
     echo hello world > b
     2041 girt-add a 
     2041 girt-commit -m 'commit-message'
+    echo $?
     2041 girt-show 0:b
     # Test removed file with other files still in commit
     2041 girt-add b 
     2041 girt-commit -m 'commit-message'
+    echo $?
     rm a 
     2041 girt-add a 
     2041 girt-commit -m 'commit-message'
+    echo $?
     2041 girt-show 2:a
     2041 girt-show 2:b
     # Test for -a option
     touch c 
     echo "line 3" >> b;
     2041 girt-commit -a -m 'commit-message'
+    echo $?
     2041 girt-show 2:b
     2041 girt-show 2:c
 
