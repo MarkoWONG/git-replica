@@ -1,6 +1,6 @@
 #!/bin/dash
 # Test script for girt-add
-# Line 5,8,11 are from lecture code
+# Line 5,8,20 are from lecture code
 # Make a temp directory for testing
 test_dir=$(mktemp -d /tmp/dir.XXXXXXXXXX)
 
@@ -107,10 +107,10 @@ diff -s "output.txt" "solution/sol.txt" >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     GREEN='\033[0;32m';
-    echo "Test girt-init -${GREEN}PASSED${NC}"
+    echo "Test girt-add -${GREEN}PASSED${NC}"
 else
     RED='\033[0;31m';
-    echo "Test girt-init -${RED}FAILED${NC}"
+    echo "Test girt-add -${RED}FAILED${NC}"
     echo "<<<<<< Your answer on the left <<<<<<<                          >>>>>> Solution on the right >>>>>>>>"
     diff -y "output.txt" "solution/sol.txt"
 fi

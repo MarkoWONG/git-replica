@@ -1,6 +1,6 @@
 #!/bin/dash
 # Test script for girt-init
-# Line 5,8,11 are from lecture code
+# Line 5,8,20 are from lecture code
 # Make a temp directory for testing
 test_dir=$(mktemp -d /tmp/dir.XXXXXXXXXX)
 
