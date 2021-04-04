@@ -29,7 +29,9 @@ cd "$test_dir" || exit 1
 mkdir "solution"
 cd "solution"
 (
-
+    # Test for a non-existent .girt repo
+    2041 girt-checkout 
+    echo $?
 ) >>"sol.txt" 2>>"sol.txt"
 cd ..
 NC='\033[0m' # No Color
@@ -37,10 +39,10 @@ diff -s "output.txt" "solution/sol.txt" >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     GREEN='\033[0;32m';
-    echo "Test girt-checkout  -${GREEN}PASSED${NC}"
+    echo "Test06 (girt-checkout)  -${GREEN}PASSED${NC}"
 else
     RED='\033[0;31m';
-    echo "Test girt-checkout  -${RED}FAILED${NC}"
+    echo "Test06 (girt-checkout)  -${RED}FAILED${NC}"
     echo "<<<<<< Your answer on the left <<<<<<<                          >>>>>> Solution on the right >>>>>>>>"
     diff -y "output.txt" "solution/sol.txt"
 fi

@@ -317,10 +317,10 @@ diff -s "output.txt" "solution/sol.txt" >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     GREEN='\033[0;32m';
-    echo "Test girt-rm -${GREEN}PASSED${NC}"
+    echo "Test03 (girt-rm) -${GREEN}PASSED${NC}"
 else
     RED='\033[0;31m';
-    echo "Test girt-rm -${RED}FAILED${NC}"
+    echo "Test03 (girt-rm) -${RED}FAILED${NC}"
     echo "<<<<<< Your answer on the left <<<<<<<                          >>>>>> Solution on the right >>>>>>>>"
     diff -y "output.txt" "solution/sol.txt"
 fi

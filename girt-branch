@@ -35,7 +35,7 @@ then
 # Error cases
 elif [ $# -eq 1 ] && [ "$1" = "-d" ]
 then 
-    echo "error girt-branch: error: branch name required";
+    echo "girt-branch: error: branch name required";
     exit 1;
 
 elif [ $# -eq 1 ] && echo "$1" | egrep -q '^-.*'
@@ -76,9 +76,6 @@ then
         done
 
         latest_commit_no=$(( $commit_no - 1 ));
-
-        # Record the latest commit when the new branch is created
-        #echo "$latest_commit_no" > .girt/branches/"$1"/latest_commit.txt;
 
         # Extract the current working branch(cwb)
         cwb=$(cat .girt/branches/current_working_branch.txt);
