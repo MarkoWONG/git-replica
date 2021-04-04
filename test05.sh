@@ -1,5 +1,5 @@
 #!/bin/dash
-# Test script for girt-
+# Test script for girt-branch 
 # Line 5,8,20 are from lecture code
 # Make a temp directory for testing
 test_dir=$(mktemp -d /tmp/dir.XXXXXXXXXX)
@@ -22,7 +22,7 @@ cd "$test_dir" || exit 1
 # Begin tests:
 (
     # Test for a non-existent .girt repo
-    ./girt-commit
+    ./girt-branch
     echo $?
 ) >>"output.txt" 2>>"output.txt"
 
@@ -37,10 +37,10 @@ diff -s "output.txt" "solution/sol.txt" >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     GREEN='\033[0;32m';
-    echo "Test girt- -${GREEN}PASSED${NC}"
+    echo "Test girt-branch -${GREEN}PASSED${NC}"
 else
     RED='\033[0;31m';
-    echo "Test girt- -${RED}FAILED${NC}"
+    echo "Test girt-branch -${RED}FAILED${NC}"
     echo "<<<<<< Your answer on the left <<<<<<<                          >>>>>> Solution on the right >>>>>>>>"
     diff -y "output.txt" "solution/sol.txt"
 fi
