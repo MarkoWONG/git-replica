@@ -33,7 +33,7 @@ then
         if [ "$1" = "$cwb" ]
         then
             echo "Already on '"$1"'";
-            exit 1;
+            exit 0;
         fi
 
     else 
