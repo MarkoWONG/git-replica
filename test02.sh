@@ -59,8 +59,9 @@ cd "$test_dir" || exit 1
     ./girt-show 0:b
     # Test removed file with other files still in commit
     ./girt-add b 
-    ./girt-commit -m 'commit-message'
+    ./girt-commit -m '     commit-message'
     echo $?
+    ./girt-log
     rm a 
     ./girt-add a 
     ./girt-commit -m 'commit-message'
@@ -118,8 +119,9 @@ cd "solution"
     2041 girt-show 0:b
     # Test removed file with other files still in commit
     2041 girt-add b 
-    2041 girt-commit -m 'commit-message'
+    2041 girt-commit -m '     commit-message'
     echo $?
+    2041 girt-log
     rm a 
     2041 girt-add a 
     2041 girt-commit -m 'commit-message'

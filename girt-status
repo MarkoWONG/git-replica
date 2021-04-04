@@ -8,7 +8,7 @@ if [ -d .girt ]
 then 
     :
 else 
-    echo "girt-show: error: girt repository directory .girt not found"
+    echo "girt-status: error: girt repository directory .girt not found"
     exit 1;
 fi
 
@@ -36,7 +36,7 @@ fi
 # Check the status of every file in cwd
 for file in *
 do
-    if [ -f "$file" ]
+    if [ -f "$file" ] && echo "$file" | egrep -qv '^girt-.*'
     then
         if [ -f .girt/index/"$file" ] && [ -f .girt/commit_"$latest_commit_no"/"$file" ]
         then
@@ -78,6 +78,9 @@ do
             elif [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_index" -eq 0 ]
             then 
                 echo ""$file" - file changed, changes not staged for commit";
+            elif [ "$cwd_diff_index" -eq 0 ]
+            then 
+                echo ""$file" - file changed, different changes staged for commit";
             else
                 echo ""$file" - same as repo";
             fi
