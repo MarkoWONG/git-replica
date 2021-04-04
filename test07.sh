@@ -24,13 +24,119 @@ cd "$test_dir" || exit 1
     # Test for a non-existent .girt repo
     ./girt-merge
     echo $?
-) >>"output.txt" 2>>"output.txt"
+    # Test for existing commit
+    ./girt-init 
+    ./girt-checkout
+    echo $?
+    seq 1 10 >p.txt
+    ./girt-add p.txt
+    ./girt-commit -m 'asd'
+    # Usage errors
+    ./girt-merge
+    echo $?
+    ./girt-merge 1 2 3 4
+    echo $?
+    ./girt-merge 1 -a 3
+    echo $?
+    ./girt-merge -a
+    echo $?
+    ./girt-merge master -m 
+    echo $?
+    # empty messages
+    ./girt-merge master -m '    '
+    echo $?
+    ./girt-merge b1
+    echo $?
+    # incorrect commit number
+    ./girt-merge 1 -m 'asf'
+    echo $?
+    ./girt-merge 123 -m 'afs'
+    echo $?
+    # incorrect branch number 
+    ./girt-merge a -m 'asf'
+    echo $?
+    ./girt-merge a223 -m 'qewf'
+    echo $?
+    
+    # nothing to merge
+    ./girt-merge 0 -m 'asf'
+    echo $?
 
+    #normal merge
+    ./girt-add p.txt 
+    ./girt-commit -m 'asd'
+    ./girt-branch b1 
+    ./girt-checkout b1
+    seq 10 20 >> p.txt  
+    ./girt-add p.txt 
+    ./girt-commit -m 'sad'
+    ./girt-checkout master 
+    ./girt-merge b1 -m 'asf'
+    echo $?
+    cat p.txt 
+    ./girt-show :p.txt
+
+) >>"output.txt" 2>>"output.txt"
 mkdir "solution"
 cd "solution"
 (
+    # Test for a non-existent .girt repo
     2041 girt-merge
     echo $?
+    # Test for existing commit
+    2041 girt-init 
+    2041 girt-checkout
+    echo $?
+    seq 1 10 >p.txt
+    2041 girt-add p.txt
+    2041 girt-commit -m 'asd'
+    # Usage errors
+    2041 girt-merge
+    echo $?
+    2041 girt-merge 1 2 3 4
+    echo $?
+    2041 girt-merge 1 -a 3
+    echo $?
+    2041 girt-merge -a
+    echo $?
+    2041 girt-merge master -m 
+    echo $?
+    # empty messages
+    2041 girt-merge master -m '    '
+    echo $?
+    2041 girt-merge b1
+    echo $?
+    # incorrect commit number
+    2041 girt-merge 1 -m 'asf'
+    echo $?
+    2041 girt-merge 123 -m 'afs'
+    echo $?
+    # incorrect branch number 
+    2041 girt-merge a -m 'asf'
+    echo $?
+    2041 girt-merge a223 -m 'qewf'
+    echo $?
+    
+    # nothing to merge
+    2041 girt-merge 0 -m 'asf'
+    echo $?
+
+    #normal merge
+    2041 girt-add p.txt 
+    2041 girt-commit -m 'asd'
+    2041 girt-branch b1 
+    2041 girt-checkout b1
+    seq 10 20 >> p.txt  
+    2041 girt-add p.txt 
+    2041 girt-commit -m 'sad'
+    2041 girt-checkout master 
+    2041 girt-merge b1 -m 'asd'
+    echo $?
+    cat p.txt 
+    2041 girt-show :p.txt
+
+    # merge conflict
+
 ) >>"sol.txt" 2>>"sol.txt"
 cd ..
 NC='\033[0m' # No Color

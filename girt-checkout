@@ -44,7 +44,6 @@ else
     echo "usage: girt-checkout <branch>"
     exit 1;
 fi
-
 # Copy all files in cwd to cwb and new_b (saving work done on the branch)
 for current_files in ./*
 do
@@ -106,7 +105,7 @@ then
             #echo ""$new_b_file" --> ./"$new_b_file_name""; 
             cp "$new_b_file" ./"$new_b_file_name"
             
-            ##overwrite file with new_b_commit for index
+            #overwrite file with new_b_commit for index
             cp "$new_b_file" .girt/index/"$new_b_file_name"
         fi 
     done
@@ -123,9 +122,9 @@ then
             #echo "removed ./"$cwb_file_name"";
             rm ./"$cwb_file_name";
             rm .girt/branches/"$1"/"$cwb_file_name";
-            if [ -f .girt/index/"$new_b_file_name" ]
+            if [ -f .girt/index/"$cwb_file_name" ]
             then
-                rm .girt/index/"$new_b_file_name";
+                rm .girt/index/"$cwb_file_name";
             fi
         fi 
     done

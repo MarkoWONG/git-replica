@@ -17,3 +17,4 @@ Date	    Start	Stop	Activity	        Comments
 01/03/21    16:00   23:00   coding              Coded the intial versions of merge
 02/04/21    09:00   12:00   testing             Wrote test script template and wrote 2 test scripts of init and add
 03/04/21    18:00   23:00   testing             Wrote test script for commit, log and show
+04/04/21    10:00   22:30   testing/debugging   Wrote the rest of the test scripts and debugged along the way    

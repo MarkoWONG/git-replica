@@ -21,11 +21,12 @@ else
 fi
 
 # Error cases
-if [ $# -eq 1 ] || [ $# -eq 2 ]
-then
+if [ $# -eq 1 ] && echo "$1" | egrep -qv '^-'
+then 
     echo "girt-merge: error: empty commit message";
     exit 1;
 fi
+
 if [ $# -ne 3 ]
 then 
     echo "usage: girt-merge <branch|commit> -m message";
@@ -34,17 +35,37 @@ elif [ "$2" != "-m" ]
 then
     echo "usage: girt-merge <branch|commit> -m message";
     exit 1;
+elif [ "$2" = "-m" ] && [ -z $(echo "$3" | sed 's/ /''/g') ]
+then
+    echo "girt-merge: error: empty commit message";
+    exit 1;
 fi
 
-#Determine if the merge source is a commit or a branch
+# Determine if the merge source is a commit or a branch
 # For commit
 if [ -d .girt/"$1" ] && echo "$1" | egrep -q '^[0-9]*$'
 then
     source_path=.girt/"$1";
 elif echo "$1" | egrep -q '^[0-9]*$'
 then
-    echo "girt-merge: error: unknown commit '"$1"'";
-    exit 1;
+    # don't merge commit if the commit is already the latest commit
+    # Calculate the prev commit number and next commit number
+    commit_no=0;
+    while [ -d ".girt/commit_"$commit_no"" ] 
+    do
+        commit_no=$(( $commit_no + 1 ));
+    done
+    latest_commit=$(( $commit_no - 1 ));
+
+    if [ "$1" -le "$latest_commit" ]
+    then 
+        echo "Already up to date"
+        exit 0;
+    elif [ "$1" -gt "$latest_commit" ]
+    then
+        echo "girt-merge: error: unknown commit '"$1"'";
+        exit 1;
+    fi
 # For branch
 elif [ -d .girt/branches/"$1" ]
 then
@@ -58,7 +79,7 @@ fi
 # Extract the current working branch(cwb)
 cwb=$(cat .girt/branches/current_working_branch.txt);
 
-#copy all files in branch to cwb
+#copy all files in source to cwb
 for files in "$source_path"/*
 do 
     file_name=$(basename "$files");
