@@ -41,43 +41,63 @@ then
     exit 1;
 fi
 
+# Extract the current working branch(cwb)
+cwb=$(cat .girt/branches/current_working_branch.txt);
+cwb_latest_commit=$(cat .girt/branches/"$cwb"/latest_commit.txt);
+branch_latest_commit=$(cat .girt/branches/"$1"/latest_commit.txt);
+
 # Determine if the merge source is a commit or a branch
 # For commit
-if [ -d .girt/"$1" ] && echo "$1" | egrep -q '^[0-9]*$'
+if [ -d .girt/commit_"$1" ] && echo "$1" | egrep -q '^[0-9]*$'
 then
-    source_path=.girt/"$1";
-elif echo "$1" | egrep -q '^[0-9]*$'
-then
-    # don't merge commit if the commit is already the latest commit
-    # Calculate the prev commit number and next commit number
-    commit_no=0;
-    while [ -d ".girt/commit_"$commit_no"" ] 
-    do
-        commit_no=$(( $commit_no + 1 ));
-    done
-    latest_commit=$(( $commit_no - 1 ));
-
-    if [ "$1" -le "$latest_commit" ]
+    # don't merge requested commit if the commit is less than or equal to the latest cwb commit
+    if [ "$1" -le "$cwb_latest_commit" ]
     then 
         echo "Already up to date"
         exit 0;
-    elif [ "$1" -gt "$latest_commit" ]
-    then
-        echo "girt-merge: error: unknown commit '"$1"'";
-        exit 1;
     fi
+    # Set the source to be a commit
+    source_path=".girt/commit_"$1"";
+    
+elif echo "$1" | egrep -q '^[0-9]*$'
+then 
+    echo "girt-merge: error: unknown commit '"$1"'";
+    exit 1;
+
 # For branch
 elif [ -d .girt/branches/"$1" ]
 then
-    source_path=.girt/branches/"$1";
+    if [ "$cwb_latest_commit" -ge "$branch_latest_commit" ]
+    then 
+        echo "Already up to date"
+        exit 0;
+    fi
+    # Set the source to be a branch
+    source_path=".girt/branches/"$1"";
 else 
     echo "girt-merge: error: unknown branch '"$1"'";
     exit 1;
 fi
 
-# add the changes to index
-# Extract the current working branch(cwb)
-cwb=$(cat .girt/branches/current_working_branch.txt);
+# if the same file differ in both current working branch/commit and 
+# merging branch/commit then merge conflict 
+for c_file in .girt/commit_"$cwb_latest_commit"/*
+do  
+    c_file_name=$(basename "$c_file")
+    #echo "comparing "$c_file_name""
+    if [ -f "$c_file" ] && 
+    [ -f .girt/commit_"$branch_latest_commit"/"$c_file_name" ] && 
+    [ "$c_file" != "commit_message.txt" ] && 
+    [ "$c_file" != "commit_owner.txt" ]
+    then 
+        diff -s "$c_file" .girt/commit_"$branch_latest_commit"/"$c_file_name" >/dev/null 2>/dev/null
+        if [ $? -ne 0 ]
+        then 
+            echo "girt-merge: error: can not merge"
+            exit 1;
+        fi 
+    fi 
+done
 
 #copy all files in source to cwb
 for files in "$source_path"/*

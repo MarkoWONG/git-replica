@@ -17,6 +17,7 @@ then
     exit 1;
 fi
 
+
 for directories in .girt/*
 do
     if echo "$directories" | egrep -q '^.girt/commit_.$' && [ -d "$directories" ]
