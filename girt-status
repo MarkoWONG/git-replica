@@ -32,7 +32,6 @@ else
 
     latest_commit_no=$(( $commit_no - 1 ));
 fi
-
 # Check the status of every file in cwd
 for file in *
 do
@@ -67,7 +66,9 @@ do
             fi
 
             # Print the status of files based on the differences detected
-            if [ "$index_diff_repo" -eq 0 ] && [ "$cwd_diff_repo" -eq 0 ] && [ "$cwd_diff_index" -eq 0 ]
+            if [ "$index_diff_repo" -eq 0 ] && 
+            [ "$cwd_diff_repo" -eq 0 ] && 
+            [ "$cwd_diff_index" -eq 0 ]
             then 
                 echo ""$file" - file changed, different changes staged for commit";
 
@@ -112,7 +113,8 @@ do
     then
         :
     else
-        if [ -f .girt/index/"$index_file_name" ] && [ -f .girt/commit_"$latest_commit_no"/"$index_file_name" ]
+        if [ -f .girt/index/"$index_file_name" ] && 
+        [ -f .girt/commit_"$latest_commit_no"/"$index_file_name" ]
         then
             # checking for difference between index and latest commit
             diff -s ".girt/index/"$index_file_name"" ".girt/commit_"$latest_commit_no"/"$index_file_name"" >/dev/null 2>/dev/null;

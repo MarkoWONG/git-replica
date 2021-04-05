@@ -44,13 +44,33 @@ else
     echo "usage: girt-checkout <branch>"
     exit 1;
 fi
+
+# # fetch the latest commit number for the branch we are switching from
+# latest_cwb_commit_no=$(cat .girt/branches/"$cwb"/latest_commit.txt);
+
+# for file in *
+# do 
+#     if [ -f "$file" ] && [ -f .girt/branches/"$1"/"$file" ] 
+#     then
+#         diff -s "$file" .girt/branches/"$1"/"$file" >/dev/null 2>/dev/null;
+#         diff1="$?"
+#         diff -s "$file" .girt/commit_"$latest_cwb_commit_no"/"$file" >/dev/null 2>/dev/null;
+#         diff2="$?"
+#         if [ "$diff1" -ne 0 ] && [ "$diff2" -ne 0 ]
+#         then
+#             echo "girt-checkout: error: Your changes to the following files would be overwritten by checkout:"
+#             echo "$file";
+#             exit 1;
+#         fi
+#     fi 
+# done
+
 # Copy all files in cwd to cwb and new_b (saving work done on the branch)
 for current_files in ./*
 do
     if [ -f "$current_files" ]
     then
         current_file_name=$(basename "$branch_files");
-        #echo "copying "$current_files" to .girt/branches/"$cwb"/"$current_file_name"";
         cp "$current_files" .girt/branches/"$cwb"/"$current_file_name";
 
         cp "$current_files" .girt/branches/"$1"/"$current_file_name";
@@ -78,8 +98,10 @@ cd ..;
 #copies all files in switching to branch to cwd
 for b_file in .girt/branches/"$1"/*
 do
-     b_file_name=$(basename "$b_file");
-    if [ -f "$b_file" ] && [ "$b_file_name" != "latest_commit.txt" ] && [ "$b_file_name" != "commit_owner.txt" ] 
+    b_file_name=$(basename "$b_file");
+    if [ -f "$b_file" ] && 
+    [ "$b_file_name" != "latest_commit.txt" ] && 
+    [ "$b_file_name" != "commit_owner.txt" ] 
     then
         cp "$b_file" ./"$b_file_name";
     fi
@@ -94,17 +116,18 @@ latest_new_b_commit_no=$(cat .girt/branches/"$1"/latest_commit.txt);
 # if branches contain different commits then
 if [ "$latest_new_b_commit_no" -ne "$latest_cwb_commit_no" ]
 then 
-    #echo "branches are different "$cwb"="$latest_cwb_commit_no" vs "$1"="$latest_new_b_commit_no""
+
     for new_b_file in .girt/commit_"$latest_new_b_commit_no"/*
     do
         #echo "new_b_file is "$new_b_file""
         new_b_file_name=$(basename "$new_b_file");
-        if [ -f "$new_b_file" ] && [ "$new_b_file_name" != "commit_message.txt" ] && [ "$new_b_file_name" != "commit_owner.txt" ] 
+        if [ -f "$new_b_file" ]&& 
+        [ "$new_b_file_name" != "commit_message.txt" ] && 
+        [ "$new_b_file_name" != "commit_owner.txt" ] 
         then 
             #overwrite file with new_b_commit for cwd
-            #echo ""$new_b_file" --> ./"$new_b_file_name""; 
             cp "$new_b_file" ./"$new_b_file_name"
-            
+
             #overwrite file with new_b_commit for index
             cp "$new_b_file" .girt/index/"$new_b_file_name"
         fi 

@@ -17,14 +17,21 @@ then
     exit 1;
 fi
 
+# Extract the current working branch(cwb)
+cwb=$(cat .girt/branches/current_working_branch.txt);
+cwb_latest_commit=$(cat .girt/branches/"$cwb"/latest_commit.txt);
 
 for directories in .girt/*
 do
     if echo "$directories" | egrep -q '^.girt/commit_.$' && [ -d "$directories" ]
     then
-        echo -n "$directories" | sed 's/.*commit_/''/g'
-        echo -n " "
-        cat "$directories/commit_message.txt"
+        owner=$(cat "$directories"/commit_owner.txt)
+        if [ "$owner" = "$cwb" ]
+        then 
+            echo -n "$directories" | sed 's/.*commit_/''/g'
+            echo -n " "
+            cat "$directories/commit_message.txt"
+        fi
     fi
 done | sort -r;
 exit 0;

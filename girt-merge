@@ -44,14 +44,15 @@ fi
 # Extract the current working branch(cwb)
 cwb=$(cat .girt/branches/current_working_branch.txt);
 cwb_latest_commit=$(cat .girt/branches/"$cwb"/latest_commit.txt);
-branch_latest_commit=$(cat .girt/branches/"$1"/latest_commit.txt);
 
 # Determine if the merge source is a commit or a branch
 # For commit
 if [ -d .girt/commit_"$1" ] && echo "$1" | egrep -q '^[0-9]*$'
 then
-    # don't merge requested commit if the commit is less than or equal to the latest cwb commit
-    if [ "$1" -le "$cwb_latest_commit" ]
+    commit_owner=$(cat .girt/commit_"$1"/commit_owner.txt)
+    # don't merge requested commit if the commit is less than or equal to the 
+    # latest cwb commit and that commit was created on the cwb
+    if [ "$1" -le "$cwb_latest_commit" ] && [ "$commit_owner" = "$cwb" ]
     then 
         echo "Already up to date"
         exit 0;
@@ -67,7 +68,11 @@ then
 # For branch
 elif [ -d .girt/branches/"$1" ]
 then
-    if [ "$cwb_latest_commit" -ge "$branch_latest_commit" ]
+    branch_latest_commit=$(cat .girt/branches/"$1"/latest_commit.txt);
+
+    # if there was no commit created in the merging brnach then no change needed
+    commit_owner=$(cat .girt/commit_"$branch_latest_commit"/commit_owner.txt)
+    if [ "$commit_owner" = "$cwb" ] 
     then 
         echo "Already up to date"
         exit 0;
@@ -87,11 +92,12 @@ do
     #echo "comparing "$c_file_name""
     if [ -f "$c_file" ] && 
     [ -f .girt/commit_"$branch_latest_commit"/"$c_file_name" ] && 
-    [ "$c_file" != "commit_message.txt" ] && 
-    [ "$c_file" != "commit_owner.txt" ]
+    [ "$c_file_name" != "commit_message.txt" ] && 
+    [ "$c_file_name" != "commit_owner.txt" ]
     then 
+        # if the same file differ and the cwb commit is more recent than the merging branch then error
         diff -s "$c_file" .girt/commit_"$branch_latest_commit"/"$c_file_name" >/dev/null 2>/dev/null
-        if [ $? -ne 0 ]
+        if [ $? -ne 0 ] && [ "$branch_latest_commit" -lt "$cwb_latest_commit" ]
         then 
             echo "girt-merge: error: can not merge"
             exit 1;
@@ -99,12 +105,18 @@ do
     fi 
 done
 
+# new commit option (when there is new files in cwd but not in merging branch)
+#for file in "$source_path"/*
+
+# Fast forward option (when the files (different content) are the same in cwd and merging branch)
 #copy all files in source to cwb
 for files in "$source_path"/*
 do 
     file_name=$(basename "$files");
-    # if file exists in cwd(instead of cwb as cwd id more up to date) and branch then ...
-    if [ -f "$files" ] && [ -f ./"$file_name" ] && [ "$file_name" != "latest_commit.txt" ]
+    # if file exists in cwd(instead of cwb as cwd id more up to date) and branch
+    if [ -f "$files" ] && 
+    [ -f ./"$file_name" ] && 
+    [ "$file_name" != "latest_commit.txt" ]
     then
         # add the changes to cwd
         cp "$files" "./"$file_name"";
@@ -121,15 +133,34 @@ do
 done
 echo "Fast-forward: no commit created";
 
-# update the latest commit (if necessary) of cwb
+# update the latest commit of cwb when merging a branch
 if echo "$1" | egrep -q '^[^0-9]'
 then
     branch_commit=$(cat .girt/branches/"$1"/latest_commit.txt);
     cwb_commit=$(cat .girt/branches/"$cwb"/latest_commit.txt);
-    #if the deleting branch latest commit is more recent than the others then error
     if [ "$branch_commit" -gt "$cwb_commit" ]
     then 
         echo "$branch_commit" > .girt/branches/"$cwb"/latest_commit.txt;
     fi
+
+    #update the new owner of commits merged 
+    for o_file in .girt/*
+    do 
+        o_file_name=$(basename "$o_file");
+        if [ -d "$o_file" ] && echo "$o_file_name" | egrep -q '^commit_'
+        then 
+            owner=$(cat "$o_file"/commit_owner.txt)
+            if [ "$owner" = "$1" ]
+            then 
+                echo "$cwb" > "$o_file"/commit_owner.txt;
+            fi
+        fi
+    done 
+
+else 
+    #update the new owner of commit merged 
+    echo "$1" > .girt/commit_"$1"/commit_owner.txt;
 fi
+
+
 exit 0;

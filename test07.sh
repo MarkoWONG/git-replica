@@ -135,8 +135,6 @@ cd "solution"
     cat p.txt 
     2041 girt-show :p.txt
 
-    # merge conflict
-
 ) >>"sol.txt" 2>>"sol.txt"
 cd ..
 NC='\033[0m' # No Color
