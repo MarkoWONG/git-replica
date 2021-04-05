@@ -35,7 +35,7 @@ fi
 # Check the status of every file in cwd
 for file in *
 do
-    if [ -f "$file" ] && echo "$file" | egrep -qv '^girt-.*'
+    if [ -f "$file" ] #&& echo "$file" | egrep -qv '^girt-.*'
     then
         if [ -f .girt/index/"$file" ] && [ -f .girt/commit_"$latest_commit_no"/"$file" ]
         then
